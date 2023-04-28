@@ -1,29 +1,29 @@
 package com.cotrin.todolist.mainActivity
 
 import android.app.Activity
-import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.app.PendingIntent
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.cotrin.todolist.*
+import com.cotrin.todolist.DateChangeReceiver
+import com.cotrin.todolist.R
 import com.cotrin.todolist.ReminderInterval.*
-import com.cotrin.todolist.notification.RemindNotificationReceiver
+import com.cotrin.todolist.RepeatInterval
+import com.cotrin.todolist.Task
 import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
 import com.cotrin.todolist.taskDetailActivity.TaskDetailActivity
 import com.cotrin.todolist.taskDetailActivity.TaskListRecyclerAdapter
@@ -38,14 +38,12 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var addTaskLauncher: ActivityResultLauncher<Intent>
-    private lateinit var editTaskLauncher: ActivityResultLauncher<Intent>
     private lateinit var textDate: TextView
     private lateinit var taskListRecycler: RecyclerView
-    private lateinit var sharedPreferences: SharedPreferences
 
     companion object {
-        var taskList = mutableMapOf<LocalDate, MutableList<Task>>()
         var date: LocalDate = LocalDate.now()
+        lateinit var sharedPreferences: SharedPreferences
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,13 +51,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         sharedPreferences = this@MainActivity.getSharedPreferences(Reference.APP_ID, MODE_PRIVATE)
-        val requestID = getRequestID()
-        taskList = loadTasks()
+        Task.loadTasks()
+
+        //翌日繰り越し処理のためのBroadcastReceiverを登録する
+        val receiver = DateChangeReceiver()
+        val intentFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_DATE_CHANGED)
+        }
+        registerReceiver(receiver, intentFilter)
 
         //RecyclerViewの表示
         taskListRecycler = findViewById<RecyclerView?>(R.id.taskListRecyclerView).apply {
-            adapter = if (taskList.containsKey(date)) {
-                TaskListRecyclerAdapter(taskList[date]!!)
+            adapter = if (Task.taskList.containsKey(date)) {
+                TaskListRecyclerAdapter(Task.taskList[date]!!)
             } else {
                 TaskListRecyclerAdapter(mutableListOf())
             }
@@ -69,9 +73,9 @@ class MainActivity : AppCompatActivity() {
                 //RecyclerView内のチェックボックスにリスナー登録、タスク保存
                 it.setOnCheckBoxClickListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
-                        if (taskList.containsKey(date)) {
-                            taskList[date]!![position].isFinished = !taskList[date]!![position].isFinished
-                            saveTasks()
+                        if (Task.taskList.containsKey(date)) {
+                            Task.taskList[date]!![position].isFinished = !Task.taskList[date]!![position].isFinished
+                            Task.saveTasks()
                         }
                     }
                 })
@@ -80,9 +84,10 @@ class MainActivity : AppCompatActivity() {
                 it.setOnTaskDetailClickListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
                         showDeleteAlertDialog {
-                            removeTaskByUUID(taskList[date]!![position].uuid)
+                            val task = Task.taskList[date]!![position]
+                            Task.removeTaskByUUID(task.uuid)
                             updateTaskList()
-                            saveTasks()
+                            Task.saveTasks()
                         }
                     }
                 })
@@ -90,12 +95,10 @@ class MainActivity : AppCompatActivity() {
                 //RecyclerViewの行Viewにリスナー登録
                 it.setOnTaskClickListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
-                        val task = taskList[date]!![position]
+                        val task = Task.taskList[date]!![position]
                         val intent = Intent(this@MainActivity, TaskDetailActivity::class.java)
                         intent.putExtra(Reference.TASK, task)
-                        intent.putExtra(Reference.TASK_POSITION, position)
-                        editTaskLauncher.launch(intent)
-                        removeTaskByUUID(task.uuid)
+                        addTaskLauncher.launch(intent)
                         updateTaskList()
                     }
                 })
@@ -108,23 +111,11 @@ class MainActivity : AppCompatActivity() {
                 //TaskDetailActivityからデータを受け取る
                 val data: Intent = result.data!!
                 var task = data.getTaskExtra(Reference.TASK)
-                //タスクが正常に受け取れた場合、タスク追加
-                task = task.copy(requestID = requestID())
-                addTask(task)
-            }
-        }
-
-        //タスク編集用Intent処理
-        editTaskLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                //TaskDetailActivityからデータを受け取る
-                val data: Intent = result.data!!
-                var task = data.getTaskExtra(Reference.TASK)
-                //タスクが正常に受け取れた場合、タスク追加、削除
-                task = task.copy(requestID = requestID())
-                addTask(task)
-                val position = data.getIntExtra(Reference.TASK_POSITION, -1)
-                if (position != -1) removeTaskByUUID(taskList[date]!![position].uuid)
+                //タスクが正常に受け取れた場合、重複するUUIDを持つタスクを削除後、タスク追加
+                task = task.copy()
+                Task.removeTaskByUUID(task.uuid)
+                Task.addTask(task, date)
+                updateTaskList()
             }
         }
 
@@ -182,6 +173,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //削除ダイアログを表示
     private fun showDeleteAlertDialog(onConform: () -> Unit) {
         AlertDialog.Builder(this).apply {
             setTitle("タスクを削除する")
@@ -202,86 +194,10 @@ class MainActivity : AppCompatActivity() {
 
     //RecyclerViewを更新
     private fun updateTaskList() {
-        if (taskList.containsKey(date)) {
-            (taskListRecycler.adapter as TaskListRecyclerAdapter?)?.setTaskList(taskList[date]!!)
+        if (Task.taskList.containsKey(date)) {
+            (taskListRecycler.adapter as TaskListRecyclerAdapter?)?.setTaskList(Task.taskList[date]!!)
         } else {
             (taskListRecycler.adapter as TaskListRecyclerAdapter?)?.setTaskList(mutableListOf())
-        }
-    }
-
-    private fun addTask(task: Task) {
-        if (taskList.containsKey(task.date))
-            taskList[task.date]?.add(task)
-        else {  
-            taskList[task.date] = mutableListOf(task)
-        }
-        val editor = sharedPreferences.edit()
-        editor.putInt(Reference.REQUEST_ID_START, task.requestID)
-        editor.apply()
-        getRemindTime(task)?.let { setRemind(this@MainActivity, it, task.requestID) }
-        updateTaskList()
-        saveTasks()
-    }
-
-    private fun removeTaskByUUID(uuid: UUID) {
-        taskList.forEach { (_, tasks) ->
-            tasks.removeIf {
-                removeRemind(this@MainActivity, it.requestID)
-                it.uuid == uuid
-            }
-        }
-    }
-
-    private fun saveTasks() {
-        val editor = sharedPreferences.edit()
-        val gson = GsonUtils.getCustomGson()
-        val json = gson.toJson(taskList)
-        editor.putString(Reference.TASK_LIST, json)
-        editor.apply()
-    }
-
-    private fun loadTasks(): MutableMap<LocalDate, MutableList<Task>> {
-        val gson = GsonUtils.getCustomGson()
-        val json = sharedPreferences.getString(Reference.TASK_LIST, null)
-        val type = object: TypeToken<MutableMap<LocalDate, MutableList<Task>>>(){}.type
-        if (json != null) return gson.fromJson(json, type) as MutableMap<LocalDate, MutableList<Task>>
-        return mutableMapOf()
-    }
-
-    //通知関連
-    private fun setRemind(context: Context, calendar: Calendar, requestID: Int) {
-        val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
-        val notificationIntent = Intent(context, RemindNotificationReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, requestID, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-    }
-
-    private fun removeRemind(context: Context, requestID: Int) {
-        val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
-        val notificationIntent = Intent(context, RemindNotificationReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, requestID, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
-        alarmManager.cancel(pendingIntent)
-    }
-
-    private fun getRemindTime(task: Task): Calendar? {
-        if (task.time == null) return null
-        val calendar = Calendar.getInstance()
-        calendar.set(task.date.year, task.date.monthValue, task.date.dayOfMonth, task.time.hour, task.time.minute)
-        when (task.remindInterval)  {
-            NONE -> null
-            FIFTEEN_MINUTES -> calendar.add(Calendar.SECOND, 10)
-            THIRTY_MINUTES -> calendar.add(Calendar.MINUTE, -30)
-            ONE_HOUR -> calendar.add(Calendar.HOUR, -1)
-            ONE_DAY -> calendar.add(Calendar.DAY_OF_MONTH, -1)
-        }
-        return calendar
-    }
-
-    private fun getRequestID(): () -> Int {
-        var id = sharedPreferences.getInt(Reference.REQUEST_ID_START, 0)
-        return {
-            id++
-            id
         }
     }
 }

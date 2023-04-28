@@ -4,7 +4,6 @@ import java.time.format.DateTimeFormatter
 
 object Reference {
     const val TASK = "TASK"
-    const val TASK_POSITION = "TASK_POSITION"
     const val REQUEST_ID_START = "REQUEST_ID_START"
 
     val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ISO_DATE

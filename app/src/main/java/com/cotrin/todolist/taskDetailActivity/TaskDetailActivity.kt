@@ -29,7 +29,7 @@ class TaskDetailActivity : AppCompatActivity() {
     private lateinit var textViewRepeat: TextView
     private lateinit var carryOverCheckBox: CheckBox
     private lateinit var textViewCategory: TextView
-    private var task = Task("", LocalDate.now(), LocalTime.now(), ReminderInterval.NONE, RepeatInterval.NONE, false, false, UUID.randomUUID(), TaskCategory.OTHER, 0)
+    private var task = Task()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +50,6 @@ class TaskDetailActivity : AppCompatActivity() {
         //MainActivityからIntentを受け取る
         val intent = intent
         if (intent.hasExtra(Reference.TASK)) task = intent.getTaskExtra(Reference.TASK)
-        val position  = intent.getIntExtra(Reference.TASK_POSITION, -1)
         if (task.time == null) textViewReminder.isEnabled = false
 
 
@@ -68,8 +67,8 @@ class TaskDetailActivity : AppCompatActivity() {
 
             override fun afterTextChanged(p0: Editable?) {}
 
-            override fun onTextChanged(p0: CharSequence, p1: Int, p2: Int, p3: Int) {
-                task = task.copy(name = p0.toString())
+            override fun onTextChanged(text: CharSequence, p1: Int, p2: Int, p3: Int) {
+                task = task.copy(name = text.toString())
             }
         })
         carryOverCheckBox.setOnClickListener {
@@ -89,7 +88,6 @@ class TaskDetailActivity : AppCompatActivity() {
                 val gson = GsonUtils.getCustomGson()
                 val json = gson.toJson(task)
                 putExtra(Reference.TASK, json)
-                if (this.hasExtra(Reference.TASK_POSITION)) putExtra(Reference.TASK_POSITION, position)
             }
             setResult(Activity.RESULT_OK, resultIntent)
             finish()
