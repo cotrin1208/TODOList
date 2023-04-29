@@ -67,7 +67,6 @@ data class Task(
             }
         }
 
-
         //タスクを翌日に繰り越す
         fun carryoverNextDay(task: Task) {
             if (!task.carryOver || task.isFinished) return
@@ -80,7 +79,7 @@ data class Task(
             }
             if (currentDate == repeatDate) return
             removeTaskByUUID(task.uuid)
-            addTask(task, currentDate.plusDays(1))
+            addTask(task, currentDate)
         }
 
         //タスク保存
