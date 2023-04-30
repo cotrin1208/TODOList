@@ -60,10 +60,8 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         } else holder.carryoverIcon.visibility = View.GONE
 
         //カテゴリアイコンの設定
-        if (taskList[position].category != TaskCategory.OTHER) {
-            val drawable = holder.view.context.getDrawable(taskList[position].category.iconResId)
-            holder.categoryIcon.setImageDrawable(drawable)
-        }
+        val drawable = holder.view.context.getDrawable(taskList[position].category.iconResId)
+        holder.categoryIcon.setImageDrawable(drawable)
     }
 
     //データの総数をカウントする
@@ -83,6 +81,7 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         this.taskClickListener = listener
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setTaskList(list: MutableList<Task>) {
         taskList = list
         this.notifyDataSetChanged()

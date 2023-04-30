@@ -21,20 +21,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cotrin.todolist.DateChangeReceiver
 import com.cotrin.todolist.R
-import com.cotrin.todolist.ReminderInterval.*
-import com.cotrin.todolist.RepeatInterval
 import com.cotrin.todolist.Task
 import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
 import com.cotrin.todolist.taskDetailActivity.TaskDetailActivity
 import com.cotrin.todolist.taskDetailActivity.TaskListRecyclerAdapter
-import com.cotrin.todolist.utils.GsonUtils
 import com.cotrin.todolist.utils.Reference
 import com.cotrin.todolist.utils.getTaskExtra
 import com.cotrin.todolist.utils.putExtra
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.gson.reflect.TypeToken
 import java.time.LocalDate
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var addTaskLauncher: ActivityResultLauncher<Intent>

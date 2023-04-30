@@ -19,7 +19,6 @@ import com.cotrin.todolist.utils.getTaskExtra
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.*
 
 class TaskDetailActivity : AppCompatActivity() {
     private lateinit var taskNameEditText: EditText
