@@ -16,7 +16,7 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
     //1行分のレイアウトを作成。task_layout.xmlとTaskListViewHolderを紐つける
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskListViewHolder {
         //レイアウトを取得(インフレート)
-        val taskXml = LayoutInflater.from(parent.context).inflate(R.layout.task_layout, parent, false)
+        val taskXml = LayoutInflater.from(parent.context).inflate(R.layout.task_card_layout, parent, false)
         return TaskListViewHolder(taskXml)
     }
 

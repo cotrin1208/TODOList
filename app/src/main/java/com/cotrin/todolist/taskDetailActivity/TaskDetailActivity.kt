@@ -28,7 +28,7 @@ class TaskDetailActivity : AppCompatActivity() {
     private lateinit var textViewRepeat: TextView
     private lateinit var carryOverCheckBox: CheckBox
     private lateinit var textViewCategory: TextView
-    private var task = Task()
+    private lateinit var task: Task
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +48,8 @@ class TaskDetailActivity : AppCompatActivity() {
 
         //MainActivityからIntentを受け取る
         val intent = intent
-        if (intent.hasExtra(Reference.TASK)) task = intent.getTaskExtra(Reference.TASK)
+        task = if (intent.hasExtra(Reference.TASK)) intent.getTaskExtra(Reference.TASK)
+        else Task()
         if (task.time == null) textViewReminder.isEnabled = false
 
 
