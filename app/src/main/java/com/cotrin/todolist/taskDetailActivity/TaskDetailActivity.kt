@@ -48,8 +48,8 @@ class TaskDetailActivity : AppCompatActivity() {
 
         //MainActivityからIntentを受け取る
         val intent = intent
-        if (intent.hasExtra(Reference.TASK)) task = intent.getTaskExtra(Reference.TASK)
-        else task = Task()
+        task = if (intent.hasExtra(Reference.TASK)) intent.getTaskExtra(Reference.TASK)
+        else Task()
         if (task.time == null) textViewReminder.isEnabled = false
 
 
