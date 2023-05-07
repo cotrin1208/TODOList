@@ -1,14 +1,15 @@
 package com.cotrin.todolist.mainActivity
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
@@ -18,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.cotrin.todolist.DateChangeReceiver
 import com.cotrin.todolist.R
 import com.cotrin.todolist.Task
 import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
@@ -28,6 +28,7 @@ import com.cotrin.todolist.utils.Reference
 import com.cotrin.todolist.utils.getTaskExtra
 import com.cotrin.todolist.utils.putExtra
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.tabs.TabLayout
 import java.time.LocalDate
 
 class MainActivity : AppCompatActivity() {
@@ -47,12 +48,8 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences = this@MainActivity.getSharedPreferences(Reference.APP_ID, MODE_PRIVATE)
         Task.loadTasks()
 
-        //翌日繰り越し処理のためのBroadcastReceiverを登録する
-        val receiver = DateChangeReceiver()
-        val intentFilter = IntentFilter().apply {
-            addAction(Intent.ACTION_DATE_CHANGED)
-        }
-        registerReceiver(receiver, intentFilter)
+        //翌日繰り越し処理
+        Task.carryoverPreviousTasks(date)
 
         //RecyclerViewの表示
         taskListRecycler = findViewById<RecyclerView?>(R.id.taskListRecyclerView).apply {
@@ -97,6 +94,25 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
             }
+        }
+
+        //日付タブ
+        findViewById<TabLayout>(R.id.dateTab).apply tab@{
+            for (i in -30 .. 30) {
+                addTab(this.newTab().setText(date.plusDays(i.toLong()).toString()))
+            }
+
+            addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    setScrollPosition(tab.position, 0f, true)
+                }
+
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
+            })
+            getTabAt(30)?.select()
+            setScrollPosition(30, 0f, true)
         }
 
         //タスク追加用Intent処理

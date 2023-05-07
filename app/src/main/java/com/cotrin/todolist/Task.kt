@@ -67,21 +67,6 @@ data class Task(
             }
         }
 
-        //タスクを翌日に繰り越す
-        fun carryoverNextDay(task: Task) {
-            if (!task.carryOver || task.isFinished) return
-            val currentDate = LocalDate.now()
-            val repeatDate = when (task.repeatInterval) {
-                RepeatInterval.NONE -> null
-                DAILY -> task.date.plusDays(1)
-                WEEKLY -> task.date.plusWeeks(1)
-                MONTHLY -> task.date.plusMonths(1)
-            }
-            if (currentDate == repeatDate) return
-            removeTaskByUUID(task.uuid)
-            addTask(task, currentDate)
-        }
-
         //タスク保存
         fun saveTasks() {
             val editor = MainActivity.sharedPreferences.edit()
@@ -99,12 +84,23 @@ data class Task(
             taskList = if (json != null) gson.fromJson(json, type) as MutableMap<LocalDate, MutableList<Task>>
             else mutableMapOf()
         }
+
+        fun carryoverPreviousTasks(date: LocalDate) {
+            taskList.filter {
+                it.key.isBefore(date)
+            }.values.flatten().filter {
+                !it.isFinished
+            }.filter {
+                it.carryOver
+            }.forEach {
+                removeTaskByUUID(it.uuid)
+                addTask(it, date)
+            }
+        }
     }
 
     fun toJsonString(): String {
         val gson = GsonUtils.getCustomGson()
         return gson.toJson(this)
     }
-
-
 }
