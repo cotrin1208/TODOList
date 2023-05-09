@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 押した時は共通 -->
+    <item android:state_pressed="true">
+        <set>
+            <objectAnimator
+                android:duration="150"
+                android:propertyName="scaleX"
+                android:valueTo="0.5f" />
+            <objectAnimator
+                android:duration="150"
+                android:propertyName="scaleY"
+                android:valueTo="0.5f" />
+        </set>
+    </item>
+
+    <!-- OFF->ON -->
+    <item
+        android:state_checked="false"
+        android:state_pressed="false">
+        <set>
+            <objectAnimator
+                android:duration="150"
+                android:propertyName="scaleX"
+                android:valueTo="0.7f" />
+            <objectAnimator
+                android:duration="150"
+                android:propertyName="scaleY"
+                android:valueTo="0.7f" />
+        </set>
+    </item>
+
+    <!-- ON->OFF -->
+    <item
+        android:state_checked="true"
+        android:state_pressed="false">
+        <set android:ordering="together">
+            <objectAnimator android:duration="300">
+                <propertyValuesHolder android:propertyName="scaleX">
+                    <keyframe
+                        android:fraction="0"
+                        android:value="0.3f" />
+                    <keyframe
+                        android:fraction="0.65"
+                        android:interpolator="@android:interpolator/decelerate_cubic"
+                        android:value="1.2f" />
+                    <keyframe
+                        android:fraction="1"
+                        android:interpolator="@android:interpolator/accelerate_cubic"
+                        android:value="0.7f" />
+                </propertyValuesHolder>
+            </objectAnimator>
+            <objectAnimator android:duration="300">
+                <propertyValuesHolder android:propertyName="scaleY">
+                    <keyframe
+                        android:fraction="0"
+                        android:value="0.3f" />
+                    <keyframe
+                        android:fraction="0.65"
+                        android:interpolator="@android:interpolator/decelerate_cubic"
+                        android:value="1.2f" />
+                    <keyframe
+                        android:fraction="1"
+                        android:interpolator="@android:interpolator/accelerate_cubic"
+                        android:value="0.7f" />
+                </propertyValuesHolder>
+            </objectAnimator>
+        </set>
+    </item>
+</selector>

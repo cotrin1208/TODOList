@@ -1,4 +1,4 @@
-package com.cotrin.todolist.taskDetailActivity
+package com.cotrin.todolist.mainActivity
 
 import android.view.View
 import android.widget.CheckBox
@@ -13,7 +13,7 @@ class TaskListViewHolder(val view: View): RecyclerView.ViewHolder(view) {
     val taskName: TextView = view.findViewById(R.id.taskName)
     val taskTime: TextView = view.findViewById(R.id.taskTime)
     val deleteTaskButton: ImageButton = view.findViewById(R.id.deleteTaskButton)
-    val remindIcon: ImageView = view.findViewById(R.id.remindIcon)
+    val remindIcon: ImageView = view.findViewById(R.id.taskRemindIcon)
     val repeatIcon : ImageView = view.findViewById(R.id.repeatIcon)
     val carryoverIcon: ImageView = view.findViewById(R.id.carryoverIcon)
     val categoryIcon: ImageView = view.findViewById(R.id.categoryIcon)

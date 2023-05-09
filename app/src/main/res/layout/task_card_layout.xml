@@ -1,10 +1,11 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cardView"
+    android:id="@+id/container"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:clickable="true"
+    android:stateListAnimator="@animator/animator_push_down"
     app:cardCornerRadius="16dp"
     app:cardElevation="8dp">
 
@@ -24,6 +25,7 @@
             android:layout_marginBottom="4dp"
             android:scaleX="0.7"
             android:scaleY="0.7"
+            android:stateListAnimator="@animator/animator_checkbox"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/taskTime"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +53,7 @@
             app:layout_constraintTop_toBottomOf="@+id/taskName" />
 
         <ImageView
-            android:id="@+id/remindIcon"
+            android:id="@+id/taskRemindIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -67,7 +69,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginBottom="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/remindIcon"
+            app:layout_constraintStart_toEndOf="@+id/taskRemindIcon"
             app:srcCompat="@drawable/task_attribute_repeat" />
 
         <ImageView
@@ -88,6 +90,7 @@
             android:background="@null"
             android:scaleX="1.3"
             android:scaleY="1.3"
+            android:stateListAnimator="@animator/animator_push_down"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

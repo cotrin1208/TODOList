@@ -8,6 +8,10 @@ android {
     namespace 'com.cotrin.todolist'
     compileSdk 32
 
+    buildFeatures {
+        viewBinding true
+    }
+
     defaultConfig {
         applicationId "com.cotrin.todolist"
         minSdk 26

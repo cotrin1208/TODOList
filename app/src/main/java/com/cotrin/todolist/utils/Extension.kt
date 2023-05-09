@@ -1,14 +1,14 @@
 package com.cotrin.todolist.utils
 
-import android.content.Intent
+import android.os.Bundle
 import com.cotrin.todolist.Task
 
-fun Intent.putExtra(name: String, task: Task) {
-    this.putExtra(name,  task.toJsonString())
+fun Bundle.putTask(name: String, task: Task) {
+    this.putString(name, task.toJsonString())
 }
 
-fun Intent.getTaskExtra(name: String): Task {
-    val json = this.getStringExtra(name)
+fun Bundle.getTask(name: String): Task {
+    val json = this.getString(name, Task().toJsonString())
     val gson = GsonUtils.getCustomGson()
     return gson.fromJson(json, Task::class.java)
 }

@@ -16,7 +16,7 @@ data class Task(
     val time: LocalTime? = null,
     val remindInterval: ReminderInterval = NONE,
     val repeatInterval: RepeatInterval = RepeatInterval.NONE,
-    val carryOver: Boolean = false,
+    val carryover: Boolean = false,
     var isFinished: Boolean = false,
     val uuid: UUID = UUID.randomUUID(),
     val category: TaskCategory = TaskCategory.OTHER,
@@ -91,7 +91,7 @@ data class Task(
             }.values.flatten().filter {
                 !it.isFinished
             }.filter {
-                it.carryOver
+                it.carryover
             }.forEach {
                 removeTaskByUUID(it.uuid)
                 addTask(it, date)

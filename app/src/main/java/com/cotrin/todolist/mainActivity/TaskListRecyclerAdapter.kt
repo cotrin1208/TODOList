@@ -1,11 +1,13 @@
-package com.cotrin.todolist.taskDetailActivity
+package com.cotrin.todolist.mainActivity
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.cotrin.todolist.*
+import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
 import com.cotrin.todolist.utils.Reference
 
 class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): RecyclerView.Adapter<TaskListViewHolder>() {
@@ -21,10 +23,10 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
     }
 
     //position番目のデータをレイアウトにセット
-    @SuppressLint("UseCompatLoadingForDrawables")
     override fun onBindViewHolder(holder: TaskListViewHolder, position: Int) {
         //チェックボックスの状態を設定
         holder.finishedSwitch.isChecked = taskList[position].isFinished
+
         //チェックボックスのリスナーを設定
         holder.finishedSwitch.setOnClickListener {
             checkBoxClickListener.onItemClick(it, position)
@@ -35,6 +37,7 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         holder.view.setOnClickListener {
             taskClickListener.onItemClick(it, position)
         }
+
         //タスク名を設定
         holder.taskName.text = taskList[position].name
         //時間を設定
@@ -44,6 +47,7 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         } ?: run {
             holder.taskTime.visibility = View.GONE
         }
+
         //リマインドアイコンの設定
         if (taskList[position].remindInterval != ReminderInterval.NONE) {
             holder.remindIcon.visibility = View.VISIBLE
@@ -55,12 +59,12 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         } else holder.repeatIcon.visibility = View.GONE
 
         //翌日持ち越しアイコンの設定
-        if (taskList[position].carryOver) {
+        if (taskList[position].carryover) {
             holder.carryoverIcon.visibility = View.VISIBLE
         } else holder.carryoverIcon.visibility = View.GONE
 
         //カテゴリアイコンの設定
-        val drawable = holder.view.context.getDrawable(taskList[position].category.iconResId)
+        val drawable =ContextCompat.getDrawable(holder.view.context, taskList[position].category.iconResId)
         holder.categoryIcon.setImageDrawable(drawable)
     }
 
