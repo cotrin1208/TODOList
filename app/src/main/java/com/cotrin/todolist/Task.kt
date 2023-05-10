@@ -54,6 +54,12 @@ data class Task(
             }
         }
 
+        //タスク編集
+        fun editTask(date: LocalDate, index: Int, task: Task) {
+            if (!taskList.containsKey(date)) return
+            taskList[date]!![index] = task
+        }
+
         //RepeatIntervalの値に応じてタスクを追加
         fun addTaskByRepeatInterval(task: Task) {
             val date = when (task.repeatInterval) {

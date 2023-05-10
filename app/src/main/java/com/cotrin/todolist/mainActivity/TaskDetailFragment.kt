@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.cotrin.todolist.R
@@ -33,6 +34,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
     private val binding get() = _binding!!
     private lateinit var task: Task
     private var position: Int = 0
+    private lateinit var mode: String
     private lateinit var listener: OnDialogResultListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -41,6 +43,9 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
             task = requireArguments().getTask(Reference.TASK)
             position = requireArguments().getInt(Reference.POSITION, 0)
         }
+
+        Toast.makeText(requireContext(), tag as String, Toast.LENGTH_SHORT).show()
+        mode = tag as String
 
         _binding = FragmentTaskDetailBinding.inflate(inflater, container, false)
         return binding.root
@@ -119,7 +124,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         //タスク登録ボタン
         binding.applyTaskButton.apply {
             setOnClickListener {
-                tag?.let { listener.onDialogResult(task, position, it as String) }
+                listener.onDialogResult(task, position, mode)
                 dismiss()
             }
         }

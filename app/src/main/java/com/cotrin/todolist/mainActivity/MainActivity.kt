@@ -24,6 +24,7 @@ import java.time.temporal.ChronoUnit
 class MainActivity : AppCompatActivity(), OnDialogResultListener {
     private lateinit var taskListRecycler: RecyclerView
     private lateinit var tabLayout: TabLayout
+    private lateinit var adapter: TaskListRecyclerAdapter
 
     companion object {
         var date: LocalDate = LocalDate.now()
@@ -67,7 +68,8 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                         showDeleteAlertDialog {
                             val task = Task.taskList[date]!![position]
                             Task.removeTaskByUUID(task.uuid)
-                            updateDeleted(position)
+                            it.notifyItemRemoved(position)
+                            it.notifyItemRangeChanged(position, it.itemCount)
                             Task.saveTasks()
                         }
                     }
@@ -87,6 +89,8 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                 })
             }
         }
+
+        adapter = taskListRecycler.adapter as TaskListRecyclerAdapter
 
         //日付タブ
         tabLayout = findViewById<TabLayout>(R.id.dateTab).apply {
@@ -167,28 +171,13 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         }
     }
 
-    private fun updateAdded() {
-        (taskListRecycler.adapter as TaskListRecyclerAdapter).apply {
-            notifyItemInserted(itemCount)
-        }
-    }
-
-    private fun updateDeleted(position: Int) {
-        (taskListRecycler.adapter as TaskListRecyclerAdapter).apply {
-            notifyItemRemoved(position)
-        }
-    }
-
-    private fun updateEdited(position: Int) {
-        (taskListRecycler.adapter as TaskListRecyclerAdapter).apply {
-            notifyItemChanged(position)
-        }
-    }
-
     override fun onDialogResult(task: Task, position: Int, mode: String) {
-        Task.removeTaskByUUID(task.uuid)
-        Task.addTask(task, date)
-        if (mode == Reference.ADD) updateAdded()
-        else if (mode == Reference.EDIT) updateEdited(position)
+        if (mode == Reference.ADD) {
+            Task.addTask(task, date)
+            adapter.notifyItemInserted(adapter.itemCount - 1)
+        } else if (mode == Reference.EDIT) {
+            Task.editTask(date, position, task)
+            adapter.notifyItemChanged(position)
+        }
     }
 }
