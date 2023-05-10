@@ -80,6 +80,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                         TaskDetailFragment().apply {
                             val args = Bundle()
                             args.putTask(Reference.TASK, task)
+                            args.putInt(Reference.POSITION, position)
                             arguments = args
                         }.show(supportFragmentManager, Reference.EDIT)
                     }
@@ -115,7 +116,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                 val args = Bundle()
                 args.putTask(Reference.TASK, Task())
                 arguments = args
-            }.show(supportFragmentManager, Reference.EDIT)
+            }.show(supportFragmentManager, Reference.ADD)
         }
 
         //カレンダー表示ボタン
@@ -178,9 +179,16 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         }
     }
 
-    override fun onDialogResult(task: Task) {
+    private fun updateEdited(position: Int) {
+        (taskListRecycler.adapter as TaskListRecyclerAdapter).apply {
+            notifyItemChanged(position)
+        }
+    }
+
+    override fun onDialogResult(task: Task, position: Int, mode: String) {
         Task.removeTaskByUUID(task.uuid)
         Task.addTask(task, date)
-        updateAdded()
+        if (mode == Reference.ADD) updateAdded()
+        else if (mode == Reference.EDIT) updateEdited(position)
     }
 }

@@ -12,6 +12,9 @@ object Reference {
     const val APP_ID = "TODOListTasks"
     const val TASK_LIST = "TASK_LIST"
 
+    const val MODE = "MODE"
     const val ADD = "ADD"
     const val EDIT = "EDIT"
+
+    const val POSITION = "POSITION"
 }

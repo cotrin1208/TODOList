@@ -74,6 +74,7 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         return taskList.size
     }
 
+
     fun setOnCheckBoxClickListener(listener: OnItemClickListener) {
         this.checkBoxClickListener = listener
     }

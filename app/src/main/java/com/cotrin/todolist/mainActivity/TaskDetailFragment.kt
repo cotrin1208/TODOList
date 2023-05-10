@@ -32,11 +32,15 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
     private var _binding: FragmentTaskDetailBinding? = null
     private val binding get() = _binding!!
     private lateinit var task: Task
+    private var position: Int = 0
     private lateinit var listener: OnDialogResultListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        arguments?.let { task = requireArguments().getTask(Reference.TASK) }
+        arguments?.let {
+            task = requireArguments().getTask(Reference.TASK)
+            position = requireArguments().getInt(Reference.POSITION, 0)
+        }
 
         _binding = FragmentTaskDetailBinding.inflate(inflater, container, false)
         return binding.root
@@ -115,7 +119,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         //タスク登録ボタン
         binding.applyTaskButton.apply {
             setOnClickListener {
-                listener.onDialogResult(task)
+                tag?.let { listener.onDialogResult(task, position, it as String) }
                 dismiss()
             }
         }
