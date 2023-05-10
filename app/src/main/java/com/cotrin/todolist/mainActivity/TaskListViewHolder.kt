@@ -1,6 +1,7 @@
 package com.cotrin.todolist.mainActivity
 
 import android.view.View
+import android.view.animation.AlphaAnimation
 import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -17,4 +18,11 @@ class TaskListViewHolder(val view: View): RecyclerView.ViewHolder(view) {
     val repeatIcon : ImageView = view.findViewById(R.id.repeatIcon)
     val carryoverIcon: ImageView = view.findViewById(R.id.carryoverIcon)
     val categoryIcon: ImageView = view.findViewById(R.id.categoryIcon)
+
+    fun startFadeInAnimation(position: Int) {
+        val anim = AlphaAnimation(0f, 1f)
+        anim.startOffset = position * 100L
+        anim.duration = 500L
+        itemView.startAnimation(anim)
+    }
 }

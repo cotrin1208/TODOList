@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                         showDeleteAlertDialog {
                             val task = Task.taskList[date]!![position]
                             Task.removeTaskByUUID(task.uuid)
-                            updateTaskList()
+                            updateDeleted(position)
                             Task.saveTasks()
                         }
                     }
@@ -77,16 +77,11 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                 it.setOnTaskClickListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
                         val task = Task.taskList[date]!![position]
-                        //val intent = Intent(this@MainActivity, TaskDetailActivity::class.java)
-                        //intent.putExtra(Reference.TASK, task)
-                        //addTaskLauncher.launch(intent)
-                        val fragment = TaskDetailFragment().apply {
+                        TaskDetailFragment().apply {
                             val args = Bundle()
                             args.putTask(Reference.TASK, task)
                             arguments = args
                         }.show(supportFragmentManager, Reference.EDIT)
-
-                        updateTaskList()
                     }
                 })
             }
@@ -113,12 +108,10 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
             post { getTabAt(dateRange.last)?.select() }
         }
 
-        //タスク追加ボタン。アクティビティを重ねて表示
+        //タスク追加ボタン。
         val addTaskButton: FloatingActionButton = findViewById(R.id.addTaskButton)
         addTaskButton.setOnClickListener {
-            //val intent = Intent(this, TaskDetailActivity::class.java)
-            //addTaskLauncher.launch(intent)
-            val fragment = TaskDetailFragment().apply {
+            TaskDetailFragment().apply {
                 val args = Bundle()
                 args.putTask(Reference.TASK, Task())
                 arguments = args
@@ -173,9 +166,21 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         }
     }
 
+    private fun updateAdded() {
+        (taskListRecycler.adapter as TaskListRecyclerAdapter).apply {
+            notifyItemInserted(itemCount)
+        }
+    }
+
+    private fun updateDeleted(position: Int) {
+        (taskListRecycler.adapter as TaskListRecyclerAdapter).apply {
+            notifyItemRemoved(position)
+        }
+    }
+
     override fun onDialogResult(task: Task) {
         Task.removeTaskByUUID(task.uuid)
         Task.addTask(task, date)
-        updateTaskList()
+        updateAdded()
     }
 }
