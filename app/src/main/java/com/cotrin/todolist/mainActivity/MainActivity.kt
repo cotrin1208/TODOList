@@ -5,26 +5,37 @@ import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import at.grabner.circleprogress.CircleProgressView
 import com.cotrin.todolist.R
 import com.cotrin.todolist.Task
+import com.cotrin.todolist.databinding.ActivityMainBinding
+import com.cotrin.todolist.taskDetailActivity.OnCardClickListener
 import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
 import com.cotrin.todolist.utils.Reference
 import com.cotrin.todolist.utils.putTask
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
+import net.cachapa.expandablelayout.ExpandableLayout
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 class MainActivity : AppCompatActivity(), OnDialogResultListener {
     private lateinit var taskListRecycler: RecyclerView
     private lateinit var tabLayout: TabLayout
     private lateinit var adapter: TaskListRecyclerAdapter
+    private lateinit var dateText: TextView
+    private lateinit var binding: ActivityMainBinding
 
     companion object {
         var date: LocalDate = LocalDate.now()
@@ -36,11 +47,18 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
         sharedPreferences = this@MainActivity.getSharedPreferences(Reference.APP_ID, MODE_PRIVATE)
         Task.loadTasks()
 
         //翌日繰り越し処理
         Task.carryoverPreviousTasks(date)
+
+        //年と月を設定
+        dateText = findViewById<TextView>(R.id.dateText).apply {
+            text = date.format(Reference.YEAR_MONTH_FORMATTER)
+        }
 
         //RecyclerViewの表示
         taskListRecycler = findViewById<RecyclerView?>(R.id.taskListRecyclerView).apply {
@@ -56,35 +74,67 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                 it.setOnCheckBoxClickListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
                         if (Task.taskList.containsKey(date)) {
-                            Task.taskList[date]!![position].isFinished = !Task.taskList[date]!![position].isFinished
+                            val  task = Task.taskList[date]!![position]
+                            Task.taskList[date]!![position] = task.copy(isFinished = !task.isFinished)
+                            Task.taskList[date]!![position].subTasks.map { subTask ->
+                                subTask.copy(isFinished = true)
+                            }
                             Task.saveTasks()
                         }
                     }
                 })
-
-                //RecyclerView内の削除ボタンにリスナー登録
+                //RecyclerView内のメニューボタンにリスナー登録
                 it.setOnTaskDetailClickListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
-                        showDeleteAlertDialog {
-                            val task = Task.taskList[date]!![position]
-                            Task.removeTaskByUUID(task.uuid)
-                            it.notifyItemRemoved(position)
-                            it.notifyItemRangeChanged(position, it.itemCount)
-                            Task.saveTasks()
-                        }
+                        PopupMenu(this@MainActivity, view).apply {
+                            inflate(R.menu.popup_menu_task)
+                            menu::class.java.getDeclaredMethod("setOptionalIconsVisible", Boolean::class.java).apply {
+                                isAccessible = true
+                                invoke(menu, true)
+                            }
+                            setOnMenuItemClickListener { menuItem ->
+                                val task = Task.taskList[date]!![position]
+                                when (menuItem.itemId) {
+                                    //編集画面の表示
+                                    R.id.menu_edit -> {
+                                        showTaskDetailFragment(Reference.EDIT, task, position)
+                                        true
+                                    }
+                                    //タスクを複製する
+                                    R.id.menu_copy -> {
+                                        onDialogResult(task.copy(uuid = UUID.randomUUID()), position, Reference.ADD)
+                                        true
+                                    }
+                                    //削除ダイアログの表示
+                                    R.id.menu_delete -> {
+                                        showDeleteAlertDialog {
+                                            Task.removeTaskByUUID(task.uuid)
+                                            it.notifyItemRemoved(position)
+                                            it.notifyItemRangeChanged(position, it.itemCount)
+                                            Task.saveTasks()
+                                        }
+                                        true
+                                    }
+                                    else -> false
+                                }
+                            }
+                        }.show()
                     }
                 })
-
                 //RecyclerViewの行Viewにリスナー登録
-                it.setOnTaskClickListener(object: OnItemClickListener {
+                it.setOnTaskClickListener(object: OnCardClickListener {
+                    override fun onItemClick(el: ExpandableLayout, position: Int) {
+                        el.toggle()
+                    }
+                })
+                //プログレスバー更新リスナー登録
+                it.setProgressChangeListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
                         val task = Task.taskList[date]!![position]
-                        TaskDetailFragment().apply {
-                            val args = Bundle()
-                            args.putTask(Reference.TASK, task)
-                            args.putInt(Reference.POSITION, position)
-                            arguments = args
-                        }.show(supportFragmentManager, Reference.EDIT)
+                        val isFinish: Boolean = if (view is CircleProgressView) {
+                            view.maxValue == view.currentValue
+                        } else false
+                        Task.taskList[date]!![position] = task.copy(isFinished = isFinish)
                     }
                 })
             }
@@ -95,14 +145,16 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         //日付タブ
         tabLayout = findViewById<TabLayout>(R.id.dateTab).apply {
             for (i in dateRange) {
-                addTab(this.newTab().setText(date.plusDays(i.toLong()).toString()))
+                val text = date.plusDays(i.toLong()).format(Reference.DAY_FORMATTER)
+                addTab(this.newTab().setText(text))
             }
 
             addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     date = LocalDate.now().plusDays(tab.position - dateRange.last.toLong())
+                    dateText.text = date.format(Reference.YEAR_MONTH_FORMATTER)
                     updateTaskList()
-                    post { smoothScrollTo(tab.view.left - width / 3, 0) }
+                    post { smoothScrollTo(tab.view.left - width / 5 * 2, 0) }
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -116,11 +168,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         //タスク追加ボタン。
         val addTaskButton: FloatingActionButton = findViewById(R.id.addTaskButton)
         addTaskButton.setOnClickListener {
-            TaskDetailFragment().apply {
-                val args = Bundle()
-                args.putTask(Reference.TASK, Task())
-                arguments = args
-            }.show(supportFragmentManager, Reference.ADD)
+            showTaskDetailFragment(Reference.ADD)
         }
 
         //カレンダー表示ボタン
@@ -165,16 +213,31 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
     //RecyclerViewを更新
     private fun updateTaskList() {
         if (Task.taskList.containsKey(date)) {
-            (taskListRecycler.adapter as TaskListRecyclerAdapter?)?.setTaskList(Task.taskList[date]!!)
+            (taskListRecycler.adapter as TaskListRecyclerAdapter).setTaskList(Task.taskList[date]!!)
         } else {
-            (taskListRecycler.adapter as TaskListRecyclerAdapter?)?.setTaskList(mutableListOf())
+            (taskListRecycler.adapter as TaskListRecyclerAdapter).setTaskList(mutableListOf())
         }
+    }
+
+    private fun showTaskDetailFragment(mode: String, task: Task? = null, position: Int? = null) {
+        TaskDetailFragment().apply {
+            val args = Bundle()
+            task?.let { args.putTask(Reference.TASK, it) }
+                ?: run { args.putTask(Reference.TASK, Task()) }
+            position?.let { args.putInt(Reference.POSITION, it) }
+            arguments = args
+        }.show(supportFragmentManager, mode)
     }
 
     override fun onDialogResult(task: Task, position: Int, mode: String) {
         if (mode == Reference.ADD) {
             Task.addTask(task, date)
-            adapter.notifyItemInserted(adapter.itemCount - 1)
+            if (adapter.itemCount == 0) {
+                adapter.setTaskList(Task.taskList[date]!!)
+            } else {
+                adapter.notifyItemInserted(adapter.itemCount - 1)
+            }
+            Toast.makeText(this@MainActivity, "ADD", Toast.LENGTH_SHORT).show()
         } else if (mode == Reference.EDIT) {
             Task.editTask(date, position, task)
             adapter.notifyItemChanged(position)

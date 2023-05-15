@@ -17,9 +17,10 @@ data class Task(
     val remindInterval: ReminderInterval = NONE,
     val repeatInterval: RepeatInterval = RepeatInterval.NONE,
     val carryover: Boolean = false,
-    var isFinished: Boolean = false,
-    val uuid: UUID = UUID.randomUUID(),
     val category: TaskCategory = TaskCategory.OTHER,
+    val subTasks: MutableList<SubTask> = mutableListOf(),
+    val isFinished: Boolean = false,
+    val uuid: UUID = UUID.randomUUID(),
     val requestID: Int = generateRequestID()
 ) {
     companion object {

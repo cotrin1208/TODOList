@@ -3,7 +3,13 @@
     <style name="CustomCheckBox" parent="android:Widget.CompoundButton.CheckBox">
         <item name="android:button">@drawable/custom_checkbox</item>
     </style>
+    <style name="CustomSmallCheckBox" parent="android:Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/custom_small_checkbox</item>
+    </style>
     <style name="CarryoverCheckBox" parent="android:Widget.CompoundButton.CheckBox">
         <item  name="android:button">@drawable/carryover_checkbox</item>
+    </style>
+    <style name="PopupMenu" parent="@style/Widget.AppCompat.PopupMenu">
+        <item name="android:popupMenuStyle">@style/Widget.AppCompat.PopupMenu</item>
     </style>
 </resources>

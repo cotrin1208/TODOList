@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
-    android:layout_width="350dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:clickable="true"
@@ -11,46 +11,10 @@
     tools:context=".mainActivity.TaskDetailFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/taskName"
         app:layout_constraintTop_toBottomOf="@+id/taskName">
-
-        <ImageView
-            android:id="@+id/taskRemindIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="@+id/taskDateIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider3"
-            app:srcCompat="@drawable/task_attribute_remind" />
-
-        <ImageView
-            android:id="@+id/taskRepeatIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="@+id/taskRemindIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider7"
-            app:srcCompat="@drawable/task_attribute_repeat" />
-
-        <ImageView
-            android:id="@+id/taskCarryoverIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="@+id/taskRepeatIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider8"
-            app:srcCompat="@drawable/task_attribute_carryover" />
-
-        <ImageView
-            android:id="@+id/taskCategoryIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="@+id/taskCarryoverIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider9"
-            app:srcCompat="@drawable/task_category_other" />
 
         <EditText
             android:id="@+id/taskTitleText"
@@ -61,9 +25,9 @@
             android:layout_marginEnd="16dp"
             android:gravity="center"
             android:hint="タスク名を入力"
+            android:inputType="textNoSuggestions"
             android:textColorHint="@android:color/darker_gray"
             android:textSize="20sp"
-            android:inputType="textNoSuggestions"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -78,254 +42,365 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider10"
+            app:layout_constraintTop_toBottomOf="@+id/divider9"
             app:srcCompat="@drawable/check_button_icon" />
-
-        <TextView
-            android:id="@+id/taskTimeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:gravity="center"
-            android:text="00:00"
-            app:layout_constraintBottom_toTopOf="@+id/divider3"
-            app:layout_constraintEnd_toStartOf="@+id/deleteTaskTimeIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider2"
-            app:layout_constraintVertical_bias="0.5" />
-
-        <TextView
-            android:id="@+id/taskDateText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="8dp"
-            android:gravity="center"
-            android:text="yyyy-mm-dd"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toTopOf="@+id/divider2"
-            app:layout_constraintEnd_toEndOf="@+id/divider2" />
-
-        <ImageView
-            android:id="@+id/taskTimeIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="27dp"
-            app:layout_constraintEnd_toStartOf="@+id/taskTitleText"
-            app:layout_constraintStart_toStartOf="@+id/divider2"
-            app:layout_constraintTop_toBottomOf="@+id/taskTitleText"
-            app:srcCompat="@drawable/calendar_icon" />
-
-        <ImageView
-            android:id="@+id/taskDateIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="@+id/taskTimeIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider2"
-            app:srcCompat="@drawable/time_icon" />
-
-        <ImageView
-            android:id="@+id/deleteTaskTimeIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            app:layout_constraintBottom_toTopOf="@+id/divider3"
-            app:layout_constraintEnd_toEndOf="@+id/divider3"
-            app:layout_constraintTop_toBottomOf="@+id/divider2"
-            app:layout_constraintVertical_bias="0.5"
-            app:srcCompat="@drawable/cancel_icon" />
 
         <View
             android:id="@+id/divider2"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/taskTimeIcon" />
+            app:layout_constraintTop_toBottomOf="@+id/dateBlock" />
 
         <View
             android:id="@+id/divider3"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/taskDateIcon" />
+            app:layout_constraintTop_toBottomOf="@+id/timeBlock" />
 
         <View
             android:id="@+id/divider7"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/taskRemindIcon" />
+            app:layout_constraintTop_toBottomOf="@+id/remindBlock" />
 
         <View
             android:id="@+id/divider8"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/taskRepeatIcon" />
-
-        <View
-            android:id="@+id/divider9"
-            android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/taskCarryoverIcon" />
+            app:layout_constraintTop_toBottomOf="@+id/repeatBlock" />
 
         <View
             android:id="@+id/divider10"
             android:layout_width="0dp"
-            android:layout_height="2dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/taskCategoryIcon" />
+            app:layout_constraintTop_toBottomOf="@+id/carryoverBlock" />
 
-        <TextView
-            android:id="@+id/detailTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="日付"
-            app:layout_constraintBottom_toBottomOf="@+id/taskTimeIcon"
-            app:layout_constraintStart_toEndOf="@+id/taskTimeIcon" />
-
-        <TextView
-            android:id="@+id/detailTitle2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="時間"
-            app:layout_constraintBottom_toTopOf="@+id/divider3"
-            app:layout_constraintStart_toEndOf="@+id/taskDateIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider2" />
-
-        <TextView
-            android:id="@+id/detailTitle3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="リマインド"
-            app:layout_constraintBottom_toTopOf="@+id/divider7"
-            app:layout_constraintStart_toEndOf="@+id/taskRemindIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider3" />
-
-        <TextView
-            android:id="@+id/detailTitle4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="リピート"
-            app:layout_constraintBottom_toTopOf="@+id/divider8"
-            app:layout_constraintStart_toEndOf="@+id/taskRepeatIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider7" />
-
-        <TextView
-            android:id="@+id/detailTitle5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="繰り越し"
-            app:layout_constraintBottom_toTopOf="@+id/divider9"
-            app:layout_constraintStart_toEndOf="@+id/taskCarryoverIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider8" />
-
-        <TextView
-            android:id="@+id/detailTitle6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="カテゴリ"
-            app:layout_constraintBottom_toTopOf="@+id/divider10"
-            app:layout_constraintStart_toEndOf="@+id/taskCategoryIcon"
-            app:layout_constraintTop_toBottomOf="@+id/divider9" />
-
-        <TextView
-            android:id="@+id/taskRemindText"
+        <View
+            android:id="@+id/divider9"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:gravity="center"
-            android:text="リマインド無し"
-            app:layout_constraintBottom_toTopOf="@+id/divider7"
-            app:layout_constraintEnd_toEndOf="@+id/divider7"
-            app:layout_constraintStart_toEndOf="@+id/detailTitle3"
-            app:layout_constraintTop_toBottomOf="@+id/divider3"
-            app:layout_constraintVertical_bias="0.5" />
+            android:layout_height="1dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/categoryBlock" />
 
-        <TextView
-            android:id="@+id/taskRepeatText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="56dp"
-            android:gravity="center"
-            android:text="リピート無し"
-            app:layout_constraintBottom_toTopOf="@+id/divider8"
-            app:layout_constraintEnd_toEndOf="@+id/divider8"
-            app:layout_constraintHorizontal_bias="0.738"
-            app:layout_constraintStart_toEndOf="@+id/detailTitle4"
-            app:layout_constraintTop_toBottomOf="@+id/divider7"
-            app:layout_constraintVertical_bias="0.5" />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/taskCarryoverSwitch"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/categoryBlock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="40dp"
-            app:layout_constraintBottom_toTopOf="@+id/divider9"
-            app:layout_constraintEnd_toEndOf="@+id/divider9"
-            app:layout_constraintTop_toBottomOf="@+id/divider8"
-            tools:ignore="UseSwitchCompatOrMaterialXml" />
+            android:background="?attr/selectableItemBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/carryoverBlock"
+            app:layout_constraintTop_toBottomOf="@+id/divider10">
 
-        <TextView
-            android:id="@+id/taskCategoryText"
-            android:layout_width="0dp"
+            <ImageView
+                android:id="@+id/taskCategoryIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/task_category_other" />
+
+            <TextView
+                android:id="@+id/taskCategoryText"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="65dp"
+                android:layout_marginEnd="15dp"
+                android:gravity="center"
+                android:text="カテゴリ無し"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/detailTitle6"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/detailTitle6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="カテゴリ"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/taskCategoryIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/carryoverBlock"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/repeatBlock"
+            app:layout_constraintTop_toBottomOf="@+id/divider8">
+
+            <ImageView
+                android:id="@+id/taskCarryoverIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/task_attribute_carryover" />
+
+            <TextView
+                android:id="@+id/detailTitle5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="繰り越し"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/taskCarryoverIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/taskCarryoverSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="84dp"
+                android:layout_marginEnd="32dp"
+                android:clickable="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/detailTitle5"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/repeatBlock"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="68dp"
-            android:layout_marginEnd="10dp"
-            android:gravity="center"
-            android:text="カテゴリ無し"
-            app:layout_constraintBottom_toTopOf="@+id/divider10"
-            app:layout_constraintEnd_toEndOf="@+id/divider10"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/detailTitle6"
-            app:layout_constraintTop_toBottomOf="@+id/divider9"
-            app:layout_constraintVertical_bias="0.526" />
+            android:background="?attr/selectableItemBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/remindBlock"
+            app:layout_constraintTop_toBottomOf="@+id/divider7">
+
+            <ImageView
+                android:id="@+id/taskRepeatIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/task_attribute_repeat" />
+
+            <TextView
+                android:id="@+id/detailTitle4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="リピート"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/taskRepeatIcon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <TextView
+                android:id="@+id/taskRepeatText"
+                android:layout_width="86dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="65dp"
+                android:layout_marginEnd="15dp"
+                android:gravity="center"
+                android:text="リピート無し"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/detailTitle4"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/remindBlock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/timeBlock"
+            app:layout_constraintTop_toBottomOf="@+id/divider3">
+
+            <ImageView
+                android:id="@+id/remindIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/task_attribute_remind" />
+
+            <TextView
+                android:id="@+id/detailTitle3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="リマインド"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/remindIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/taskRemindText"
+                android:layout_width="99dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="43dp"
+                android:layout_marginEnd="9dp"
+                android:gravity="center"
+                android:text="リマインド無し"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.759"
+                app:layout_constraintStart_toEndOf="@+id/detailTitle3"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.545" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/timeBlock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/dateBlock"
+            app:layout_constraintTop_toBottomOf="@+id/divider2">
+
+            <ImageView
+                android:id="@+id/taskTimeIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/time_icon" />
+
+            <TextView
+                android:id="@+id/detailTitle2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="時間"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/taskTimeIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/taskTimeText"
+                android:layout_width="36dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="114dp"
+                android:layout_marginEnd="43dp"
+                android:gravity="center"
+                android:text="00:00"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/detailTitle2"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/dateBlock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/taskTitleText">
+
+            <ImageView
+                android:id="@+id/taskDateIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/calendar_icon" />
+
+            <TextView
+                android:id="@+id/detailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="日付"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/taskDateIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/taskDateText"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginStart="92dp"
+                android:layout_marginEnd="24dp"
+                android:gravity="center"
+                android:text="yyyy-mm-dd"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/detailTitle"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

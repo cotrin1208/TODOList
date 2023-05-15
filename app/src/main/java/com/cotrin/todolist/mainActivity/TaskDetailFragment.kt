@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -15,7 +16,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.cotrin.todolist.R
@@ -40,11 +40,9 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         arguments?.let {
-            task = requireArguments().getTask(Reference.TASK)
+            task = requireArguments().getTask(getString(R.string.argument_key_task))
             position = requireArguments().getInt(Reference.POSITION, 0)
         }
-
-        Toast.makeText(requireContext(), tag as String, Toast.LENGTH_SHORT).show()
         mode = tag as String
 
         _binding = FragmentTaskDetailBinding.inflate(inflater, container, false)
@@ -80,43 +78,26 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
             })
         }
         //日付表示
-        binding.taskDateText.apply {
-            text = task.date.toString()
-            setOnClickListener { showDatePickerDialog() }
-        }
+        binding.taskDateText.text = task.date.toString()
         //時刻表示
         binding.taskTimeText.apply {
             text = task.time?.format(Reference.TIME_FORMATTER) ?: run { "**:**" }
-            setOnClickListener { showTimePickerDialog() }
-        }
-        //時刻キャンセルボタン
-        binding.deleteTaskTimeIcon.setOnClickListener {
-            binding.taskTimeText.text = "**:**"
-            binding.taskRemindText.isEnabled = false
-            binding.taskRemindText.text = ReminderInterval.NONE.OptionName
-            task = task.copy(time = null, remindInterval = ReminderInterval.NONE)
         }
         //リマインド表示
         binding.taskRemindText.apply {
             isEnabled = (task.time != null)
             text = task.remindInterval.OptionName
-            setOnClickListener { showReminderDialog() }
         }
         //リピート表示
         binding.taskRepeatText.apply {
             text = task.repeatInterval.OptionName
-            setOnClickListener { showRepeatDialog() }
         }
         //繰り越し表示
         binding.taskCarryoverSwitch.apply {
             isChecked = task.carryover
-            setOnCheckedChangeListener { _, bool ->
-                task = task.copy(carryover = bool)
-            }
         }
         //カテゴリ表示
         binding.taskCategoryText.apply {
-            setOnClickListener { showCategoryDialog() }
             text = task.category.categoryName
             val drawable = ContextCompat.getDrawable(requireContext(), task.category.iconResId)
             binding.taskCategoryIcon.setImageDrawable(drawable)
@@ -128,6 +109,21 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
                 dismiss()
             }
         }
+        //日付ブロック
+        binding.dateBlock.setOnClickListener { showDatePickerDialog() }
+        //時刻ブロック
+        binding.timeBlock.setOnClickListener { showTimePickerDialog() }
+        //リマインドブロック
+        binding.remindBlock.setOnClickListener { showReminderDialog() }
+        //リピートブロック
+        binding.repeatBlock.setOnClickListener { showRepeatDialog() }
+        //繰り越しブロック
+        binding.carryoverBlock.setOnClickListener {
+            binding.taskCarryoverSwitch.toggle()
+            task = task.copy(carryover = binding.taskCarryoverSwitch.isChecked)
+        }
+        //カテゴリブロック
+        binding.categoryBlock.setOnClickListener { showCategoryDialog() }
     }
 
     override fun onAttach(context: Context) {
@@ -153,7 +149,14 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
     private fun showTimePickerDialog() {
         TimePickerDialog(requireContext(), { _, hour, minute ->
             task = task.copy(time = LocalTime.of(hour, minute))
-            updateView() }, 0, 0, true).show()
+            updateView() }, 0, 0, true).apply {
+                setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.remove_time)) { _, _ ->
+                    task = task.copy(time = null)
+                    binding.taskRemindText.isEnabled = false
+                    binding.taskRemindText.text = ReminderInterval.NONE.OptionName
+                    updateView()
+                }
+        }.show()
         binding.taskRemindText.isEnabled = true
     }
 
