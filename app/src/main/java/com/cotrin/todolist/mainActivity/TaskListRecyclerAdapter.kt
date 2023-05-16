@@ -16,8 +16,10 @@ import com.cotrin.todolist.taskDetailActivity.OnCardClickListener
 import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
 import com.cotrin.todolist.taskDetailActivity.OnTextChangeListener
 import com.cotrin.todolist.utils.Reference
+import io.realm.kotlin.internal.platform.returnType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -43,7 +45,7 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
     override fun onBindViewHolder(holder: TaskListViewHolder, position: Int) {
         val task = taskList[position]
         //プログレスバーアップデート
-        val updateProgress = {
+        fun updateProgress() {
             val progressBar = holder.binding.progressBar
             progressBar.maxValue = if (taskList[position].subTasks.size == 0) {
                 1f
@@ -52,10 +54,12 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
             }
             progressBar.setValueAnimated(taskList[position].subTasks.count { it.isFinished }.toFloat(), 300L)
             CoroutineScope(Dispatchers.Main).launch {
-                delay(400)
-                val isFinish = (progressBar.maxValue == progressBar.currentValue) && (progressBar.maxValue != 0f)
-                holder.binding.finishedCheckBox.isChecked = isFinish
-                progressChangedListener.onItemClick(progressBar, position)
+                if (task.subTasks.isNotEmpty()) {
+                    delay(350)
+                    val isFinish = progressBar.maxValue == progressBar.currentValue
+                    holder.binding.finishedCheckBox.isChecked = isFinish
+                    progressChangedListener.onItemClick(progressBar, position)
+                }
             }
         }
         //チェックボックスの状態を設定
@@ -113,40 +117,38 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         updateProgress()
         //サブタスク設定
         holder.binding.subTasks.apply {
-            adapter = SubTaskAdapter(task.subTasks)
             layoutManager = LinearLayoutManager(holder.binding.root.context)
-            adapter?.let {
-                it as SubTaskAdapter
-                //サブタスクチェックボックスのリスナー登録
-                it.setOnCheckBoxClickListener(object: OnItemClickListener {
-                    override fun onItemClick(view: View, position: Int) {
-                        val subTask = task.subTasks[position]
-                        task.subTasks[position] = subTask.copy(isFinished = !subTask.isFinished)
-                        Task.saveTasks()
-                        updateProgress()
+            adapter = SubTaskAdapter(task.subTasks)
+            val subTaskAdapter = adapter as SubTaskAdapter
+            //サブタスクチェックボックスのリスナー登録
+            subTaskAdapter.setOnCheckBoxClickListener(object: OnItemClickListener {
+                override fun onItemClick(view: View, position: Int) {
+                    val subTask = task.subTasks[position]
+                    task.subTasks[position] = subTask.copy(isFinished = !subTask.isFinished)
+                    Task.saveTasks()
+                    updateProgress()
+                }
+            })
+            //サブタスク名のリスナー登録
+            subTaskAdapter.setOnTextChangeListener(object: OnTextChangeListener {
+                override fun onTextChanged(s: CharSequence, position: Int) {
+                    val subTask = task.subTasks[position]
+                    task.subTasks[position] = subTask.copy(name = s.toString())
+                    Task.saveTasks()
+                }
+            })
+            //サブタスク削除ボタンのリスナー登録
+            subTaskAdapter.setOnDeleteButtonClickListener(object: OnItemClickListener {
+                override fun onItemClick(view: View, position: Int) {
+                    task.subTasks.removeAt(position)
+                    adapter?.let { subTaskAdapter ->
+                        subTaskAdapter.notifyItemRemoved(position)
+                        subTaskAdapter.notifyItemRangeChanged(position, subTaskAdapter.itemCount)
                     }
-                })
-                //サブタスク名のリスナー登録
-                it.setOnTextChangeListener(object: OnTextChangeListener {
-                    override fun onTextChanged(s: CharSequence, position: Int) {
-                        val subTask = task.subTasks[position]
-                        task.subTasks[position] = subTask.copy(name = s.toString())
-                        Task.saveTasks()
-                    }
-                })
-                //サブタスク削除ボタンのリスナー登録
-                it.setOnDeleteButtonClickListener(object: OnItemClickListener {
-                    override fun onItemClick(view: View, position: Int) {
-                        task.subTasks.removeAt(position)
-                        adapter?.let { subTaskAdapter ->
-                            subTaskAdapter.notifyItemRemoved(position)
-                            subTaskAdapter.notifyItemRangeChanged(position, subTaskAdapter.itemCount)
-                        }
-                        updateProgress()
-                        Task.saveTasks()
-                    }
-                })
-            }
+                    updateProgress()
+                    Task.saveTasks()
+                }
+            })
         }
 
         //サブタスク追加ボタン
