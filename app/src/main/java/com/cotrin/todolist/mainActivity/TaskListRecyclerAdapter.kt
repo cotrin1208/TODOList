@@ -1,13 +1,12 @@
 package com.cotrin.todolist.mainActivity
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,6 +42,22 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
     //position番目のデータをレイアウトにセット
     override fun onBindViewHolder(holder: TaskListViewHolder, position: Int) {
         val task = taskList[position]
+        //プログレスバーアップデート
+        val updateProgress = {
+            val progressBar = holder.binding.progressBar
+            progressBar.maxValue = if (taskList[position].subTasks.size == 0) {
+                1f
+            } else {
+                taskList[position].subTasks.size.toFloat()
+            }
+            progressBar.setValueAnimated(taskList[position].subTasks.count { it.isFinished }.toFloat(), 300L)
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(400)
+                val isFinish = (progressBar.maxValue == progressBar.currentValue) && (progressBar.maxValue != 0f)
+                holder.binding.finishedCheckBox.isChecked = isFinish
+                progressChangedListener.onItemClick(progressBar, position)
+            }
+        }
         //チェックボックスの状態を設定
         holder.binding.finishedCheckBox.apply {
             isChecked = task.isFinished
@@ -53,23 +68,8 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
                         task.subTasks[index] = task.subTasks[index].copy(isFinished = isChecked)
                     }
                     it.notifyItemRangeChanged(0, it.itemCount)
+                    updateProgress()
                 }
-            }
-        }
-        //プログレスバーアップデート
-        val updateProgress = {
-            val progressBar = holder.binding.progressBar
-            progressBar.maxValue = if (taskList[position].subTasks.size == 0) {
-                1f
-            } else {
-                taskList[position].subTasks.size.toFloat()
-            }
-            progressBar.setValue(taskList[position].subTasks.count { it.isFinished }.toFloat())
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(30)
-                val isFinish = (progressBar.maxValue == progressBar.currentValue) && (progressBar.maxValue != 0f)
-                holder.binding.finishedCheckBox.isChecked = isFinish
-                progressChangedListener.onItemClick(progressBar, position)
             }
         }
         //メニューボタンの設定

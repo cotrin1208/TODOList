@@ -76,9 +76,9 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                         if (Task.taskList.containsKey(date)) {
                             val  task = Task.taskList[date]!![position]
                             Task.taskList[date]!![position] = task.copy(isFinished = !task.isFinished)
-                            Task.taskList[date]!![position].subTasks.map { subTask ->
-                                subTask.copy(isFinished = true)
-                            }
+                            //Task.taskList[date]!![position].subTasks.map { subTask ->
+                            //    subTask.copy(isFinished = true)
+                            //}
                             Task.saveTasks()
                         }
                     }
