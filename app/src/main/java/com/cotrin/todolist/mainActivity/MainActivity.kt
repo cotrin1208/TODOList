@@ -60,11 +60,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
 
         //RecyclerViewの表示
         taskListRecycler = findViewById<RecyclerView?>(R.id.taskListRecyclerView).apply {
-            adapter = if (Task.taskList.containsKey(date)) {
-                TaskListRecyclerAdapter(Task.taskList[date]!!)
-            } else {
-                TaskListRecyclerAdapter(mutableListOf())
-            }
+            adapter = TaskListRecyclerAdapter(Task.taskList)
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter?.let {
                 it as TaskListRecyclerAdapter
@@ -84,7 +80,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                                 invoke(menu, true)
                             }
                             setOnMenuItemClickListener { menuItem ->
-                                val task = Task.taskList[date]!![position]
+                                val task = Task.taskList[position]
                                 when (menuItem.itemId) {
                                     //編集画面の表示
                                     R.id.menu_edit -> {
@@ -121,11 +117,11 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                 //プログレスバー更新リスナー登録
                 it.setProgressChangeListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
-                        val task = Task.taskList[date]!![position]
+                        val task = Task.taskList[position]
                         val isFinish: Boolean = if (view is CircleProgressView) {
                             view.maxValue == view.currentValue
                         } else false
-                        Task.taskList[date]!![position] = task.copy(isFinished = isFinish)
+                        Task.taskList[position] = task.copy(isFinished = isFinish)
                     }
                 })
             }
@@ -144,7 +140,6 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     date = LocalDate.now().plusDays(tab.position - dateRange.last.toLong())
                     dateText.text = date.format(Reference.YEAR_MONTH_FORMATTER)
-                    updateTaskList()
                     post { smoothScrollTo(tab.view.left - width / 5 * 2, 0) }
                 }
 
@@ -176,7 +171,6 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                 val daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.of(year, month + 1, dayOfMonth))
                 tabLayout.getTabAt(daysBetween.toInt() + dateRange.last)?.select()
                 date = LocalDate.of(year, month + 1, dayOfMonth)
-                updateTaskList()
             }
             show()
         }
@@ -201,15 +195,6 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         }.show()
     }
 
-    //RecyclerViewを更新
-    private fun updateTaskList() {
-        if (Task.taskList.containsKey(date)) {
-            (taskListRecycler.adapter as TaskListRecyclerAdapter).setTaskList(Task.taskList[date]!!)
-        } else {
-            (taskListRecycler.adapter as TaskListRecyclerAdapter).setTaskList(mutableListOf())
-        }
-    }
-
     private fun showTaskDetailFragment(mode: String, task: Task? = null, position: Int? = null) {
         TaskDetailFragment().apply {
             val args = Bundle()
@@ -224,7 +209,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         if (mode == Reference.ADD) {
             Task.addTask(task)
             if (adapter.itemCount == 0) {
-                adapter.setTaskList(Task.taskList[date]!!)
+                adapter.notifyDataSetChanged()
             } else {
                 adapter.notifyItemInserted(adapter.itemCount - 1)
             }
