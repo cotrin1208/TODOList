@@ -24,7 +24,7 @@ data class Task(
     val requestID: Int = generateRequestID()
 ) {
     companion object {
-        var taskList = mutableMapOf<LocalDate, MutableList<Task>>()
+        var taskList = mutableListOf<Task>()
         val generateRequestID = getRequestID()
 
         //シーケンシャルID生成
@@ -37,11 +37,8 @@ data class Task(
         }
 
         //タスク追加
-        fun addTask(task: Task, date: LocalDate) {
-            if (taskList.containsKey(date))
-                taskList[date]!!.add(task)
-            else
-                taskList[date] = mutableListOf(task)
+        fun addTask(task: Task) {
+            taskList.add(task)
             val editor = MainActivity.sharedPreferences.edit()
             editor.putInt(Reference.REQUEST_ID_START, task.requestID)
             editor.apply()
@@ -50,15 +47,12 @@ data class Task(
 
         //タスク削除
         fun removeTaskByUUID(uuid: UUID) {
-            taskList.forEach { (_, tasks) ->
-                tasks.removeIf { it.uuid == uuid }
-            }
+            taskList.removeIf { it.uuid == uuid }
         }
 
         //タスク編集
-        fun editTask(date: LocalDate, index: Int, task: Task) {
-            if (!taskList.containsKey(date)) return
-            taskList[date]!![index] = task
+        fun editTask(index: Int, task: Task) {
+            taskList[index] = task
         }
 
         //RepeatIntervalの値に応じてタスクを追加
@@ -70,7 +64,7 @@ data class Task(
                 MONTHLY -> task.date.plusMonths(1)
             }
             date?.let {
-                addTask(task.copy(date = it), it)
+                addTask(task.copy(date = it))
             }
         }
 
@@ -88,20 +82,19 @@ data class Task(
             val gson = GsonUtils.getCustomGson()
             val json = MainActivity.sharedPreferences.getString(Reference.TASK_LIST, null)
             val type = object: TypeToken<MutableMap<LocalDate, MutableList<Task>>>(){}.type
-            taskList = if (json != null) gson.fromJson(json, type) as MutableMap<LocalDate, MutableList<Task>>
-            else mutableMapOf()
+            taskList = if (json != null) gson.fromJson(json, type) as MutableList<Task>
+            else mutableListOf()
         }
 
         fun carryoverPreviousTasks(date: LocalDate) {
             taskList.filter {
-                it.key.isBefore(date)
-            }.values.flatten().filter {
+                it.date.isBefore(date)
+            }.filter {
                 !it.isFinished
             }.filter {
                 it.carryover
             }.forEach {
-                removeTaskByUUID(it.uuid)
-                addTask(it, date)
+                it.date.plusDays(1)
             }
         }
     }

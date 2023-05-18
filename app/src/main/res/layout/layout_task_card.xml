@@ -45,51 +45,22 @@
             android:id="@+id/taskTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:text="@string/default_time_text"
+            android:textSize="10sp"
             app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
             app:layout_constraintStart_toEndOf="@+id/taskDate"
             app:layout_constraintTop_toBottomOf="@+id/taskName" />
 
-        <ImageView
-            android:id="@+id/categoryIcon"
+        <TextView
+            android:id="@+id/taskDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="38dp"
-            app:layout_constraintStart_toEndOf="@+id/taskTime"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/task_category_other" />
-
-        <ImageView
-            android:id="@+id/remindIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="38dp"
-            app:layout_constraintStart_toEndOf="@+id/categoryIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/task_attribute_remind" />
-
-        <ImageView
-            android:id="@+id/repeatIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="38dp"
-            app:layout_constraintStart_toEndOf="@+id/remindIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/task_attribute_repeat" />
-
-        <ImageView
-            android:id="@+id/carryoverIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="38dp"
-            app:layout_constraintStart_toEndOf="@+id/repeatIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/task_attribute_carryover" />
+            android:text="@string/default_date_text"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
+            app:layout_constraintStart_toStartOf="@+id/taskName"
+            app:layout_constraintTop_toBottomOf="@+id/taskName" />
 
         <ImageButton
             android:id="@+id/taskMenuButton"
@@ -124,6 +95,75 @@
             app:layout_constraintTop_toTopOf="@+id/finishedCheckBox">
 
         </at.grabner.circleprogress.CircleProgressView>
+
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="34dp"
+            app:chipSpacingHorizontal="-2dp"
+            app:layout_constraintStart_toEndOf="@+id/taskTime"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/categoryChip"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="-12dp"
+                android:layout_marginTop="34dp"
+                android:layout_marginEnd="1dp"
+                app:chipBackgroundColor="@color/chip_bg"
+                app:chipIcon="@drawable/task_category_other"
+                app:chipIconSize="16dp"
+                app:chipStrokeColor="@color/chip_stroke"
+                app:chipStrokeWidth="1dp"
+                app:textEndPadding="-2dp"
+                app:textStartPadding="0dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/remindChip"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="-6dp"
+                android:text="15分前"
+                android:textSize="8sp"
+                app:chipBackgroundColor="@color/chip_bg"
+                app:chipIcon="@drawable/task_attribute_remind"
+                app:chipIconSize="16dp"
+                app:chipStrokeColor="@color/chip_stroke"
+                app:chipStrokeWidth="1dp"
+                app:textEndPadding="0dp"
+                app:textStartPadding="2dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/repeatChip"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:text="毎週"
+                android:textSize="8sp"
+                app:chipBackgroundColor="@color/chip_bg"
+                app:chipIcon="@drawable/task_attribute_repeat"
+                app:chipIconSize="16dp"
+                app:chipStrokeColor="@color/chip_stroke"
+                app:chipStrokeWidth="1dp"
+                app:textEndPadding="0dp"
+                app:textStartPadding="2dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/carryoverChip"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="-8dp"
+                app:chipBackgroundColor="@color/chip_bg"
+                app:chipIcon="@drawable/task_attribute_carryover"
+                app:chipIconSize="16dp"
+                app:chipStrokeColor="@color/chip_stroke"
+                app:chipStrokeWidth="1dp"
+                app:textEndPadding="0dp"
+                app:textStartPadding="0dp" />
+
+        </com.google.android.material.chip.ChipGroup>
 
         <net.cachapa.expandablelayout.ExpandableLayout
             android:id="@+id/expandableLayout"
@@ -186,18 +226,10 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                 </androidx.recyclerview.widget.RecyclerView>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </net.cachapa.expandablelayout.ExpandableLayout>
-
-        <TextView
-            android:id="@+id/taskDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/default_date_text"
-            app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
-            app:layout_constraintStart_toStartOf="@+id/taskName"
-            app:layout_constraintTop_toBottomOf="@+id/taskName" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

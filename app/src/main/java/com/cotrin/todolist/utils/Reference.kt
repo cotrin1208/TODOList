@@ -8,7 +8,7 @@ object Reference {
 
     val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ISO_DATE
     val DAY_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("d日")
-    val MONTH_DAY_FORMATTER = DateTimeFormatter.ofPattern("M月d日")
+    val MONTH_DAY_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("M/d")
     val YEAR_MONTH_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年M月")
     val TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 

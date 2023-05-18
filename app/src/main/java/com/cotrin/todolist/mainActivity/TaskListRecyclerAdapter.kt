@@ -1,6 +1,5 @@
 package com.cotrin.todolist.mainActivity
 
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -11,15 +10,14 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cotrin.todolist.*
+import com.cotrin.todolist.ReminderInterval.*
 import com.cotrin.todolist.databinding.LayoutTaskCardBinding
 import com.cotrin.todolist.taskDetailActivity.OnCardClickListener
 import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
 import com.cotrin.todolist.taskDetailActivity.OnTextChangeListener
 import com.cotrin.todolist.utils.Reference
-import io.realm.kotlin.internal.platform.returnType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -94,21 +92,24 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         } ?: run {
             holder.binding.taskTime.visibility = View.GONE
         }
-        //リマインドアイコンの設定
-        if (task.remindInterval != ReminderInterval.NONE) {
-            holder.binding.remindIcon.visibility = View.VISIBLE
-        } else holder.binding.remindIcon.visibility = View.GONE
-        //リピートアイコンの設定
-        if (task.repeatInterval != RepeatInterval.NONE) {
-            holder.binding.repeatIcon.visibility = View.VISIBLE
-        } else holder.binding.repeatIcon.visibility = View.GONE
-        //翌日持ち越しアイコンの設定
-        if (task.carryover) {
-            holder.binding.carryoverIcon.visibility = View.VISIBLE
-        } else holder.binding.carryoverIcon.visibility = View.GONE
         //カテゴリアイコンの設定
         val drawable = ContextCompat.getDrawable(holder.binding.root.context, task.category.iconResId)
-        holder.binding.categoryIcon.setImageDrawable(drawable)
+        holder.binding.categoryChip.chipIcon = drawable
+        //リマインドアイコンの設定
+        if (task.remindInterval == NONE)
+            holder.binding.remindChip.visibility = View.GONE
+        else
+            holder.binding.remindChip.text = task.remindInterval.OptionName
+        //リピートアイコンの設定
+        if (task.repeatInterval == RepeatInterval.NONE)
+            holder.binding.repeatChip.visibility = View.GONE
+        else
+            holder.binding.repeatChip.text = task.repeatInterval.OptionName
+        //翌日持ち越しアイコンの設定
+        if (task.carryover)
+            holder.binding.carryoverChip.visibility = View.VISIBLE
+        else
+            holder.binding.carryoverChip.visibility = View.GONE
         //タスクカードのリスナー設定
         holder.binding.root.setOnClickListener {
             taskClickListener.onItemClick(holder.binding.expandableLayout, position)
@@ -133,7 +134,7 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
             subTaskAdapter.setOnTextChangeListener(object: OnTextChangeListener {
                 override fun onTextChanged(s: CharSequence, position: Int) {
                     val subTask = task.subTasks[position]
-                    task.subTasks[position] = subTask.copy(name = s.toString())
+                    //task.subTasks[position] = subTask.copy(name = s.toString())
                     Task.saveTasks()
                 }
             })

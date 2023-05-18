@@ -5,7 +5,6 @@ import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -26,7 +25,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import net.cachapa.expandablelayout.ExpandableLayout
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
@@ -73,14 +71,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                 //RecyclerView内のチェックボックスにリスナー登録、タスク保存
                 it.setOnCheckBoxClickListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
-                        if (Task.taskList.containsKey(date)) {
-                            val  task = Task.taskList[date]!![position]
-                            Task.taskList[date]!![position] = task.copy(isFinished = !task.isFinished)
-                            //Task.taskList[date]!![position].subTasks.map { subTask ->
-                            //    subTask.copy(isFinished = true)
-                            //}
-                            Task.saveTasks()
-                        }
+                        Task.saveTasks()
                     }
                 })
                 //RecyclerView内のメニューボタンにリスナー登録
@@ -108,7 +99,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                                     //削除ダイアログの表示
                                     R.id.menu_delete -> {
                                         showDeleteAlertDialog {
-                                            Task.removeTaskByUUID(task.uuid)
+                                            //Task.removeTaskByUUID(task.uuid)
                                             it.notifyItemRemoved(position)
                                             it.notifyItemRangeChanged(position, it.itemCount)
                                             Task.saveTasks()
@@ -231,7 +222,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
 
     override fun onDialogResult(task: Task, position: Int, mode: String) {
         if (mode == Reference.ADD) {
-            Task.addTask(task, date)
+            Task.addTask(task)
             if (adapter.itemCount == 0) {
                 adapter.setTaskList(Task.taskList[date]!!)
             } else {
@@ -239,7 +230,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
             }
             Toast.makeText(this@MainActivity, "ADD", Toast.LENGTH_SHORT).show()
         } else if (mode == Reference.EDIT) {
-            Task.editTask(date, position, task)
+            Task.editTask(position, task)
             adapter.notifyItemChanged(position)
         }
     }
