@@ -16,8 +16,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
@@ -98,7 +96,10 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         //時刻ブロック
         binding.timeBlock.setOnClickListener { showTimePickerDialog() }
         //リマインドブロック
-        binding.remindBlock.setOnClickListener { showReminderDialog() }
+        binding.remindBlock.setOnClickListener {
+            it.isEnabled = false
+            showReminderDialog()
+        }
         //リピートブロック
         binding.repeatBlock.setOnClickListener { showRepeatDialog() }
         //繰り越しブロック
@@ -111,7 +112,10 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         //MainViewModelのタスクを連動して変更する
         taskDetailViewModel.name.observe(requireActivity()) { mainViewModel.task.name = it }
         taskDetailViewModel.date.observe(requireActivity()) { mainViewModel.task.date = it }
-        taskDetailViewModel.time.observe(requireActivity()) { mainViewModel.task.time = it }
+        taskDetailViewModel.time.observe(requireActivity()) {
+            mainViewModel.task.time = it
+            binding.taskTimeText.text = taskDetailViewModel.getTimeText()
+        }
         taskDetailViewModel.remind.observe(requireActivity()) { mainViewModel.task.remind = it }
         taskDetailViewModel.repeat.observe(requireActivity()) { mainViewModel.task.repeat = it }
         taskDetailViewModel.category.observe(requireActivity()) { mainViewModel.task.category = it }
