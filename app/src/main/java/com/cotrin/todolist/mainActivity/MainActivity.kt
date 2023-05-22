@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import at.grabner.circleprogress.CircleProgressView
@@ -21,6 +23,7 @@ import com.cotrin.todolist.taskDetailActivity.OnCardClickListener
 import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
 import com.cotrin.todolist.utils.Reference
 import com.cotrin.todolist.utils.putTask
+import com.cotrin.todolist.viewModel.MainActivityViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import net.cachapa.expandablelayout.ExpandableLayout
@@ -31,9 +34,11 @@ import java.util.UUID
 class MainActivity : AppCompatActivity(), OnDialogResultListener {
     private lateinit var taskListRecycler: RecyclerView
     private lateinit var tabLayout: TabLayout
-    private lateinit var adapter: TaskListRecyclerAdapter
     private lateinit var dateText: TextView
     private lateinit var binding: ActivityMainBinding
+    private val viewModel by lazy {
+        ViewModelProvider(this)[MainActivityViewModel::class.java]
+    }
 
     companion object {
         var date: LocalDate = LocalDate.now()
@@ -43,9 +48,8 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.lifecycleOwner = this
 
         sharedPreferences = this@MainActivity.getSharedPreferences(Reference.APP_ID, MODE_PRIVATE)
         Task.loadTasks()
@@ -60,18 +64,15 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
 
         //RecyclerViewの表示
         taskListRecycler = findViewById<RecyclerView?>(R.id.taskListRecyclerView).apply {
-            adapter = TaskListRecyclerAdapter(Task.taskList)
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter?.let {
-                it as TaskListRecyclerAdapter
+            TaskListRecyclerAdapter().apply {
                 //RecyclerView内のチェックボックスにリスナー登録、タスク保存
-                it.setOnCheckBoxClickListener(object: OnItemClickListener {
+                setOnCheckBoxClickListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
                         Task.saveTasks()
                     }
                 })
                 //RecyclerView内のメニューボタンにリスナー登録
-                it.setOnTaskDetailClickListener(object: OnItemClickListener {
+                setOnTaskDetailClickListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
                         PopupMenu(this@MainActivity, view).apply {
                             inflate(R.menu.popup_menu_task)
@@ -84,6 +85,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                                 when (menuItem.itemId) {
                                     //編集画面の表示
                                     R.id.menu_edit -> {
+                                        viewModel.taskData.value = task
                                         showTaskDetailFragment(Reference.EDIT, task, position)
                                         true
                                     }
@@ -95,9 +97,9 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                                     //削除ダイアログの表示
                                     R.id.menu_delete -> {
                                         showDeleteAlertDialog {
-                                            //Task.removeTaskByUUID(task.uuid)
-                                            it.notifyItemRemoved(position)
-                                            it.notifyItemRangeChanged(position, it.itemCount)
+                                            Task.removeTaskByUUID(task.uuid)
+                                            notifyItemRemoved(position)
+                                            notifyItemRangeChanged(position, itemCount)
                                             Task.saveTasks()
                                         }
                                         true
@@ -109,13 +111,13 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                     }
                 })
                 //RecyclerViewの行Viewにリスナー登録
-                it.setOnTaskClickListener(object: OnCardClickListener {
+                setOnTaskClickListener(object: OnCardClickListener {
                     override fun onItemClick(el: ExpandableLayout, position: Int) {
                         el.toggle()
                     }
                 })
                 //プログレスバー更新リスナー登録
-                it.setProgressChangeListener(object: OnItemClickListener {
+                setProgressChangeListener(object: OnItemClickListener {
                     override fun onItemClick(view: View, position: Int) {
                         val task = Task.taskList[position]
                         val isFinish: Boolean = if (view is CircleProgressView) {
@@ -124,11 +126,9 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                         Task.taskList[position] = task.copy(isFinished = isFinish)
                     }
                 })
+                binding.adapter = this
             }
         }
-
-        adapter = taskListRecycler.adapter as TaskListRecyclerAdapter
-
         //日付タブ
         tabLayout = findViewById<TabLayout>(R.id.dateTab).apply {
             for (i in dateRange) {
@@ -151,17 +151,24 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
             post { getTabAt(dateRange.last)?.select() }
         }
 
-        //タスク追加ボタン。
-        val addTaskButton: FloatingActionButton = findViewById(R.id.addTaskButton)
-        addTaskButton.setOnClickListener {
-            showTaskDetailFragment(Reference.ADD)
-        }
-
         //カレンダー表示ボタン
         val showCalendarButton: FloatingActionButton = findViewById(R.id.calendarButton)
         showCalendarButton.setOnClickListener {
             showDatePickerDialog()
         }
+
+        //タスク追加ボタンのリスナー登録
+        viewModel.isAddFragmentShown.observe(this) {
+            if (!it) return@observe
+            showTaskDetailFragment(Reference.ADD)
+        }
+        //タスク編集時のリスナー登録
+        viewModel.isEditFragmentShown.observe(this) {
+            if (!it) return@observe
+
+        }
+
+        binding.viewModel = viewModel
     }
 
     //タスク一覧をクリックしたらカレンダーを開く
@@ -206,6 +213,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
     }
 
     override fun onDialogResult(task: Task, position: Int, mode: String) {
+        val adapter = binding.adapter as TaskListRecyclerAdapter
         if (mode == Reference.ADD) {
             Task.addTask(task)
             if (adapter.itemCount == 0) {

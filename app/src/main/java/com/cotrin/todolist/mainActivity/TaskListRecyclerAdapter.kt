@@ -1,6 +1,5 @@
 package com.cotrin.todolist.mainActivity
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +8,11 @@ import android.view.animation.AlphaAnimation
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.cotrin.todolist.*
-import com.cotrin.todolist.ReminderInterval.*
+import com.cotrin.todolist.ReminderInterval.NONE
+import com.cotrin.todolist.RepeatInterval
+import com.cotrin.todolist.SubTask
+import com.cotrin.todolist.SubTaskAdapter
+import com.cotrin.todolist.Task
 import com.cotrin.todolist.databinding.LayoutTaskCardBinding
 import com.cotrin.todolist.taskDetailActivity.OnCardClickListener
 import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
@@ -22,7 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): RecyclerView.Adapter<TaskListViewHolder>() {
+class TaskListRecyclerAdapter : RecyclerView.Adapter<TaskListRecyclerAdapter.TaskListViewHolder>() {
     private lateinit var checkBoxClickListener: OnItemClickListener
     private lateinit var taskMenuClickListener: OnItemClickListener
     private lateinit var taskClickListener: OnCardClickListener
@@ -41,19 +43,21 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
 
     //position番目のデータをレイアウトにセット
     override fun onBindViewHolder(holder: TaskListViewHolder, position: Int) {
-        val task = taskList[position]
+        val task = Task.taskList[position]
+
+        holder.bind(task)
         //プログレスバーアップデート
         fun updateProgress() {
             val progressBar = holder.binding.progressBar
-            progressBar.maxValue = if (taskList[position].subTasks.size == 0) {
+            progressBar.maxValue = if (Task.taskList[position].subTasks.size == 0) {
                 1f
             } else {
-                taskList[position].subTasks.size.toFloat()
+                Task.taskList[position].subTasks.size.toFloat()
             }
-            progressBar.setValueAnimated(taskList[position].subTasks.count { it.isFinished }.toFloat(), 300L)
+            progressBar.setValueAnimated(Task.taskList[position].subTasks.count { it.isFinished }.toFloat(), 200L)
             CoroutineScope(Dispatchers.Main).launch {
                 if (task.subTasks.isNotEmpty()) {
-                    delay(350)
+                    delay(250)
                     val isFinish = progressBar.maxValue == progressBar.currentValue
                     holder.binding.finishedCheckBox.isChecked = isFinish
                     progressChangedListener.onItemClick(progressBar, position)
@@ -96,15 +100,15 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         val drawable = ContextCompat.getDrawable(holder.binding.root.context, task.category.iconResId)
         holder.binding.categoryChip.chipIcon = drawable
         //リマインドアイコンの設定
-        if (task.remindInterval == NONE)
+        if (task.remind == NONE)
             holder.binding.remindChip.visibility = View.GONE
         else
-            holder.binding.remindChip.text = task.remindInterval.OptionName
+            holder.binding.remindChip.text = task.remind.OptionName
         //リピートアイコンの設定
-        if (task.repeatInterval == RepeatInterval.NONE)
+        if (task.repeat == RepeatInterval.NONE)
             holder.binding.repeatChip.visibility = View.GONE
         else
-            holder.binding.repeatChip.text = task.repeatInterval.OptionName
+            holder.binding.repeatChip.text = task.repeat.OptionName
         //翌日持ち越しアイコンの設定
         if (task.carryover)
             holder.binding.carryoverChip.visibility = View.VISIBLE
@@ -134,7 +138,7 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
             subTaskAdapter.setOnTextChangeListener(object: OnTextChangeListener {
                 override fun onTextChanged(s: CharSequence, position: Int) {
                     val subTask = task.subTasks[position]
-                    //task.subTasks[position] = subTask.copy(name = s.toString())
+                    task.subTasks[position] = subTask.copy(name = s.toString())
                     Task.saveTasks()
                 }
             })
@@ -164,7 +168,7 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
 
     //データの総数をカウントする
     override fun getItemCount(): Int {
-        return taskList.size
+        return Task.taskList.size
     }
 
     fun setOnCheckBoxClickListener(listener: OnItemClickListener) {
@@ -183,9 +187,16 @@ class TaskListRecyclerAdapter(private var taskList: MutableList<Task>): Recycler
         this.progressChangedListener = listener
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun setTaskList(list: MutableList<Task>) {
-        taskList = list
-        this.notifyDataSetChanged()
+    inner class TaskListViewHolder(val binding: LayoutTaskCardBinding): RecyclerView.ViewHolder(binding.root) {
+        fun bind(task: Task) {
+            binding.task = task
+        }
+
+        fun startFadeInAnimation(position: Int) {
+            val anim = AlphaAnimation(0f, 1f)
+            anim.startOffset = position * 100L
+            anim.duration = 500L
+            itemView.startAnimation(anim)
+        }
     }
 }

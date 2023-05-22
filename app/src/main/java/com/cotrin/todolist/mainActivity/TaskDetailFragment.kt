@@ -16,8 +16,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import com.cotrin.todolist.R
 import com.cotrin.todolist.ReminderInterval
 import com.cotrin.todolist.RepeatInterval
@@ -25,14 +28,19 @@ import com.cotrin.todolist.Task
 import com.cotrin.todolist.TaskCategory
 import com.cotrin.todolist.databinding.FragmentTaskDetailBinding
 import com.cotrin.todolist.utils.Reference
-import com.cotrin.todolist.utils.getTask
+import com.cotrin.todolist.viewModel.MainActivityViewModel
+import com.cotrin.todolist.viewModel.TaskDetailViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 
 class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
-    private var _binding: FragmentTaskDetailBinding? = null
-    private val binding get() = _binding!!
-    private lateinit var task: Task
+    private lateinit var binding: FragmentTaskDetailBinding
+    private val mainViewModel by lazy {
+        ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
+    }
+    private val taskDetailViewModel by lazy {
+        ViewModelProvider(requireActivity())[TaskDetailViewModel::class.java]
+    }
     private var position: Int = 0
     private lateinit var mode: String
     private lateinit var listener: OnDialogResultListener
@@ -40,12 +48,13 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         arguments?.let {
-            task = requireArguments().getTask(getString(R.string.argument_key_task))
             position = requireArguments().getInt(Reference.POSITION, 0)
         }
         mode = tag as String
 
-        _binding = FragmentTaskDetailBinding.inflate(inflater, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_task_detail, container, false)
+        binding.lifecycleOwner = requireActivity()
+        binding.viewModel = taskDetailViewModel
         return binding.root
     }
 
@@ -56,7 +65,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
                 setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                 setGravity(Gravity.CENTER)
                 addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-                setDimAmount(0.5f)
+                setDimAmount(0.6f)
             }
         }
     }
@@ -64,50 +73,25 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //Viewの初期化
+        val task = mainViewModel.task
+        taskDetailViewModel.name.value = task.name
+        taskDetailViewModel.date.value = task.date
+        taskDetailViewModel.time.value = task.time
+        taskDetailViewModel.remind.value = task.remind
+        taskDetailViewModel.repeat.value = task.repeat
+        taskDetailViewModel.category.value = task.category
+        taskDetailViewModel.carryover.value = task.carryover
         //タスク名
         binding.taskTitleText.apply {
-            setText(task.name)
             addTextChangedListener(object: TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
                 override fun afterTextChanged(p0: Editable?) {}
 
                 override fun onTextChanged(text: CharSequence, p1: Int, p2: Int, p3: Int) {
-                    task = task.copy(name = text.toString())
+                    taskDetailViewModel.name.value = text.toString()
                 }
             })
-        }
-        //日付表示
-        binding.taskDateText.text = task.date.toString()
-        //時刻表示
-        binding.taskTimeText.apply {
-            text = task.time?.format(Reference.TIME_FORMATTER) ?: run { "**:**" }
-        }
-        //リマインド表示
-        binding.taskRemindText.apply {
-            isEnabled = (task.time != null)
-            text = task.remindInterval.OptionName
-        }
-        //リピート表示
-        binding.taskRepeatText.apply {
-            text = task.repeatInterval.OptionName
-        }
-        //繰り越し表示
-        binding.taskCarryoverSwitch.apply {
-            isChecked = task.carryover
-        }
-        //カテゴリ表示
-        binding.taskCategoryText.apply {
-            text = task.category.categoryName
-            val drawable = ContextCompat.getDrawable(requireContext(), task.category.iconResId)
-            binding.taskCategoryIcon.setImageDrawable(drawable)
-        }
-        //タスク登録ボタン
-        binding.applyTaskButton.apply {
-            setOnClickListener {
-                listener.onDialogResult(task, position, mode)
-                dismiss()
-            }
         }
         //日付ブロック
         binding.dateBlock.setOnClickListener { showDatePickerDialog() }
@@ -120,10 +104,25 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         //繰り越しブロック
         binding.carryoverBlock.setOnClickListener {
             binding.taskCarryoverSwitch.toggle()
-            task = task.copy(carryover = binding.taskCarryoverSwitch.isChecked)
+            taskDetailViewModel.carryover.value = binding.taskCarryoverSwitch.isChecked
         }
         //カテゴリブロック
         binding.categoryBlock.setOnClickListener { showCategoryDialog() }
+        //MainViewModelのタスクを連動して変更する
+        taskDetailViewModel.name.observe(requireActivity()) { mainViewModel.task.name = it }
+        taskDetailViewModel.date.observe(requireActivity()) { mainViewModel.task.date = it }
+        taskDetailViewModel.time.observe(requireActivity()) { mainViewModel.task.time = it }
+        taskDetailViewModel.remind.observe(requireActivity()) { mainViewModel.task.remind = it }
+        taskDetailViewModel.repeat.observe(requireActivity()) { mainViewModel.task.repeat = it }
+        taskDetailViewModel.category.observe(requireActivity()) { mainViewModel.task.category = it }
+        taskDetailViewModel.carryover.observe(requireActivity()) { mainViewModel.task.carryover = it }
+        //タスク登録ボタン
+        binding.applyTaskButton.apply {
+            setOnClickListener {
+                listener.onDialogResult(mainViewModel.taskData.value!!, position, mode)
+                dismiss()
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -133,14 +132,15 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
 
     override fun onDestroy() {
         super.onDestroy()
-        _binding = null
+        mainViewModel.isAddFragmentShown.value = false
+        mainViewModel.task = Task()
     }
 
     private fun showDatePickerDialog() {
         DatePickerDialog(requireContext()).apply {
             setOnDateSetListener { _, year, month, dayOfMonth ->
-                task = task.copy(date = LocalDate.of(year, month + 1, dayOfMonth))
-                updateView()
+                val date = LocalDate.of(year, month + 1, dayOfMonth)
+                taskDetailViewModel.date.value = date
             }
             show()
         }
@@ -148,15 +148,17 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
 
     private fun showTimePickerDialog() {
         TimePickerDialog(requireContext(), { _, hour, minute ->
-            task = task.copy(time = LocalTime.of(hour, minute))
-            updateView() }, 0, 0, true).apply {
+            val time = LocalTime.of(hour, minute)
+            taskDetailViewModel.time.value = time },
+            0, 0, true).apply {
                 setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.remove_time)) { _, _ ->
-                    task = task.copy(time = null)
-                    binding.taskRemindText.isEnabled = false
+                    taskDetailViewModel.time.value = null
                     binding.taskRemindText.text = ReminderInterval.NONE.OptionName
-                    updateView()
+                    binding.remindBlock.isEnabled = false
+                    binding.taskRemindText.isEnabled = false
                 }
         }.show()
+        binding.remindBlock.isEnabled = true
         binding.taskRemindText.isEnabled = true
     }
 
@@ -165,8 +167,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         AlertDialog.Builder(requireContext()).apply {
             setTitle("リマインダーを設定")
             setItems(reminderOptions) { _, option ->
-                task = task.copy(remindInterval = ReminderInterval.values()[option])
-                updateView()
+                taskDetailViewModel.remind.value = ReminderInterval.values()[option]
             }
         }.show()
     }
@@ -176,8 +177,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         AlertDialog.Builder(requireContext()).apply {
             setTitle("繰り返し間隔を設定")
             setItems(repeatOptions) { _, option ->
-                task = task.copy(repeatInterval = RepeatInterval.values()[option])
-                updateView()
+                taskDetailViewModel.repeat.value = RepeatInterval.values()[option]
             }
         }.show()
     }
@@ -187,20 +187,8 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         AlertDialog.Builder(requireContext()).apply {
             setTitle("カテゴリーを設定")
             setItems(categoryOptions) { _, option ->
-                task = task.copy(category = TaskCategory.values()[option])
-                val drawable = ContextCompat.getDrawable(requireContext(), task.category.iconResId)
-                binding.taskCategoryIcon.setImageDrawable(drawable)
-                updateView()
+                taskDetailViewModel.category.value = TaskCategory.values()[option]
             }
         }.show()
-    }
-
-    private fun updateView() {
-        binding.taskDateText.text = task.date.format(Reference.DATE_FORMATTER)
-        binding.taskTimeText.text = task.time?.format(Reference.TIME_FORMATTER) ?: run { "**:**" }
-        binding.taskRemindText.text = task.remindInterval.OptionName
-        binding.taskRepeatText.text = task.repeatInterval.OptionName
-        binding.taskCarryoverSwitch.isChecked = task.carryover
-        binding.taskCategoryText.text = task.category.categoryName
     }
 }

@@ -1,236 +1,247 @@
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:clickable="true"
-    android:stateListAnimator="@animator/animator_push_down"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp">
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="394dp"
+    <data>
+        <variable
+            name="task"
+            type="com.cotrin.todolist.Task" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/container"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/taskName"
-        app:layout_constraintTop_toBottomOf="@+id/taskName">
+        android:layout_margin="8dp"
+        android:clickable="true"
+        android:stateListAnimator="@animator/animator_push_down"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp">
 
-        <CheckBox
-            android:id="@+id/finishedCheckBox"
-            style="@style/CustomCheckBox"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="394dp"
             android:layout_height="wrap_content"
-            android:scaleX="0.7"
-            android:scaleY="0.7"
-            android:stateListAnimator="@animator/animator_checkbox"
-            app:layout_constraintEnd_toStartOf="@+id/taskDate"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="@+id/taskName"
+            app:layout_constraintTop_toBottomOf="@+id/taskName">
 
-        <TextView
-            android:id="@+id/taskName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="68dp"
-            android:layout_marginTop="6dp"
-            android:maxWidth="220dp"
-            android:maxLines="1"
-            android:text="@string/task_name_hint"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/taskTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="@string/default_time_text"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
-            app:layout_constraintStart_toEndOf="@+id/taskDate"
-            app:layout_constraintTop_toBottomOf="@+id/taskName" />
-
-        <TextView
-            android:id="@+id/taskDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/default_date_text"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
-            app:layout_constraintStart_toStartOf="@+id/taskName"
-            app:layout_constraintTop_toBottomOf="@+id/taskName" />
-
-        <ImageButton
-            android:id="@+id/taskMenuButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="11dp"
-            android:layout_marginEnd="24dp"
-            android:background="@null"
-            android:stateListAnimator="@animator/animator_push_down"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/menu_icon" />
-
-        <at.grabner.circleprogress.CircleProgressView
-            android:id="@+id/progressBar"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:scaleX="0.98"
-            android:scaleY="0.98"
-            app:cpv_barColor="@color/teal_200"
-            app:cpv_barWidth="4dp"
-            app:cpv_innerContourSize="0dp"
-            app:cpv_maxValue="100"
-            app:cpv_outerContourSize="0dp"
-            app:cpv_rimColor="@android:color/transparent"
-            app:cpv_rimWidth="3dp"
-            app:cpv_textColor="@android:color/transparent"
-            app:cpv_value="0"
-            app:layout_constraintBottom_toBottomOf="@+id/finishedCheckBox"
-            app:layout_constraintEnd_toEndOf="@+id/finishedCheckBox"
-            app:layout_constraintStart_toStartOf="@+id/finishedCheckBox"
-            app:layout_constraintTop_toTopOf="@+id/finishedCheckBox">
-
-        </at.grabner.circleprogress.CircleProgressView>
-
-        <com.google.android.material.chip.ChipGroup
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="34dp"
-            app:chipSpacingHorizontal="-2dp"
-            app:layout_constraintStart_toEndOf="@+id/taskTime"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/categoryChip"
+            <CheckBox
+                android:id="@+id/finishedCheckBox"
+                style="@style/CustomCheckBox"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="-12dp"
-                android:layout_marginTop="34dp"
-                android:layout_marginEnd="1dp"
-                app:chipBackgroundColor="@color/chip_bg"
-                app:chipIcon="@drawable/task_category_other"
-                app:chipIconSize="16dp"
-                app:chipStrokeColor="@color/chip_stroke"
-                app:chipStrokeWidth="1dp"
-                app:textEndPadding="-2dp"
-                app:textStartPadding="0dp" />
+                android:layout_height="wrap_content"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:stateListAnimator="@animator/animator_checkbox"
+                android:checked="@{task.finished}"
+                app:layout_constraintEnd_toStartOf="@+id/taskDate"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/remindChip"
+            <TextView
+                android:id="@+id/taskName"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="-6dp"
-                android:text="15分前"
-                android:textSize="8sp"
-                app:chipBackgroundColor="@color/chip_bg"
-                app:chipIcon="@drawable/task_attribute_remind"
-                app:chipIconSize="16dp"
-                app:chipStrokeColor="@color/chip_stroke"
-                app:chipStrokeWidth="1dp"
-                app:textEndPadding="0dp"
-                app:textStartPadding="2dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginStart="68dp"
+                android:layout_marginTop="6dp"
+                android:maxWidth="220dp"
+                android:maxLines="1"
+                android:text="@string/task_name_hint"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/repeatChip"
+            <TextView
+                android:id="@+id/taskTime"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="毎週"
-                android:textSize="8sp"
-                app:chipBackgroundColor="@color/chip_bg"
-                app:chipIcon="@drawable/task_attribute_repeat"
-                app:chipIconSize="16dp"
-                app:chipStrokeColor="@color/chip_stroke"
-                app:chipStrokeWidth="1dp"
-                app:textEndPadding="0dp"
-                app:textStartPadding="2dp" />
+                android:text="@string/default_time_text"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
+                app:layout_constraintStart_toEndOf="@+id/taskDate"
+                app:layout_constraintTop_toBottomOf="@+id/taskName" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/carryoverChip"
+            <TextView
+                android:id="@+id/taskDate"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="-8dp"
-                app:chipBackgroundColor="@color/chip_bg"
-                app:chipIcon="@drawable/task_attribute_carryover"
-                app:chipIconSize="16dp"
-                app:chipStrokeColor="@color/chip_stroke"
-                app:chipStrokeWidth="1dp"
-                app:textEndPadding="0dp"
-                app:textStartPadding="0dp" />
+                android:layout_height="wrap_content"
+                android:text="@string/default_date_text"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
+                app:layout_constraintStart_toStartOf="@+id/taskName"
+                app:layout_constraintTop_toBottomOf="@+id/taskName" />
 
-        </com.google.android.material.chip.ChipGroup>
+            <ImageButton
+                android:id="@+id/taskMenuButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="11dp"
+                android:layout_marginEnd="24dp"
+                android:background="@null"
+                android:stateListAnimator="@animator/animator_push_down"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/menu_icon" />
 
-        <net.cachapa.expandablelayout.ExpandableLayout
-            android:id="@+id/expandableLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            app:el_duration="500"
-            app:el_expanded="false"
-            app:el_parallax="0.3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/finishedCheckBox">
+            <at.grabner.circleprogress.CircleProgressView
+                android:id="@+id/progressBar"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleX="0.98"
+                android:scaleY="0.98"
+                app:cpv_barColor="@color/teal_200"
+                app:cpv_barWidth="4dp"
+                app:cpv_innerContourSize="0dp"
+                app:cpv_maxValue="100"
+                app:cpv_outerContourSize="0dp"
+                app:cpv_rimColor="@android:color/transparent"
+                app:cpv_rimWidth="3dp"
+                app:cpv_textColor="@android:color/transparent"
+                app:cpv_value="0"
+                app:layout_constraintBottom_toBottomOf="@+id/finishedCheckBox"
+                app:layout_constraintEnd_toEndOf="@+id/finishedCheckBox"
+                app:layout_constraintStart_toStartOf="@+id/finishedCheckBox"
+                app:layout_constraintTop_toTopOf="@+id/finishedCheckBox">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            </at.grabner.circleprogress.CircleProgressView>
 
-                <LinearLayout
-                    android:id="@+id/addSubTask"
+            <com.google.android.material.chip.ChipGroup
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="34dp"
+                app:chipSpacingHorizontal="-2dp"
+                app:layout_constraintStart_toEndOf="@+id/taskTime"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/categoryChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="-12dp"
+                    android:layout_marginTop="34dp"
+                    android:layout_marginEnd="1dp"
+                    app:chipBackgroundColor="@color/chip_bg"
+                    app:chipIcon="@drawable/task_category_other"
+                    app:chipIconSize="16dp"
+                    app:chipStrokeColor="@color/chip_stroke"
+                    app:chipStrokeWidth="1dp"
+                    app:textEndPadding="-2dp"
+                    app:textStartPadding="0dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/remindChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="-6dp"
+                    android:text="15分前"
+                    android:textSize="8sp"
+                    app:chipBackgroundColor="@color/chip_bg"
+                    app:chipIcon="@drawable/task_attribute_remind"
+                    app:chipIconSize="16dp"
+                    app:chipStrokeColor="@color/chip_stroke"
+                    app:chipStrokeWidth="1dp"
+                    app:textEndPadding="0dp"
+                    app:textStartPadding="2dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/repeatChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="4dp"
+                    android:text="毎週"
+                    android:textSize="8sp"
+                    app:chipBackgroundColor="@color/chip_bg"
+                    app:chipIcon="@drawable/task_attribute_repeat"
+                    app:chipIconSize="16dp"
+                    app:chipStrokeColor="@color/chip_stroke"
+                    app:chipStrokeWidth="1dp"
+                    app:textEndPadding="0dp"
+                    app:textStartPadding="2dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/carryoverChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="-8dp"
+                    app:chipBackgroundColor="@color/chip_bg"
+                    app:chipIcon="@drawable/task_attribute_carryover"
+                    app:chipIconSize="16dp"
+                    app:chipStrokeColor="@color/chip_stroke"
+                    app:chipStrokeWidth="1dp"
+                    app:textEndPadding="0dp"
+                    app:textStartPadding="0dp" />
+
+            </com.google.android.material.chip.ChipGroup>
+
+            <net.cachapa.expandablelayout.ExpandableLayout
+                android:id="@+id/expandableLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:el_duration="500"
+                app:el_expanded="false"
+                app:el_parallax="0.3"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/finishedCheckBox">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="100dp"
-                    android:layout_marginEnd="100dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:orientation="horizontal"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent">
+                    android:layout_height="match_parent">
 
-                    <ImageView
-                        android:id="@+id/imageView"
-                        android:layout_width="32dp"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/add_icon" />
+                    <LinearLayout
+                        android:id="@+id/addSubTask"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="100dp"
+                        android:layout_marginEnd="100dp"
+                        android:layout_marginBottom="4dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent">
 
-                    <TextView
-                        android:id="@+id/textView2"
+                        <ImageView
+                            android:id="@+id/imageView"
+                            android:layout_width="32dp"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/add_icon" />
+
+                        <TextView
+                            android:id="@+id/textView2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="サブタスクを追加"
+                            android:textColor="@color/teal_700"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/subTasks"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="サブタスクを追加"
-                        android:textColor="@color/teal_700"
-                        android:textSize="16sp" />
+                        android:layout_marginBottom="4dp"
+                        app:layout_constraintBottom_toTopOf="@+id/addSubTask"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                </LinearLayout>
+                    </androidx.recyclerview.widget.RecyclerView>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/subTasks"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    app:layout_constraintBottom_toTopOf="@+id/addSubTask"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </androidx.recyclerview.widget.RecyclerView>
+            </net.cachapa.expandablelayout.ExpandableLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </net.cachapa.expandablelayout.ExpandableLayout>
+    </androidx.cardview.widget.CardView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.cardview.widget.CardView>
+</layout>

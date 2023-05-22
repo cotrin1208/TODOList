@@ -12,7 +12,7 @@ object Reference {
     val YEAR_MONTH_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年M月")
     val TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-    const val APP_ID = "TODOListTasks"
+    const val APP_ID = "TODOList"
     const val TASK_LIST = "TASK_LIST"
 
     const val ADD = "ADD"

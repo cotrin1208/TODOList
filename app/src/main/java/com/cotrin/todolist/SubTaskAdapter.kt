@@ -61,5 +61,5 @@ class SubTaskAdapter(private val subTasks: List<SubTask>): RecyclerView.Adapter<
         deleteButtonClickListener = listener
     }
 
-    class SubTaskViewHolder(val binding: LayoutSubTaskBinding): RecyclerView.ViewHolder(binding.root) {}
+    class SubTaskViewHolder(val binding: LayoutSubTaskBinding): RecyclerView.ViewHolder(binding.root)
 }

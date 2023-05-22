@@ -11,15 +11,15 @@ import java.time.LocalTime
 import java.util.*
 
 data class Task(
-    val name: String = "",
-    val date: LocalDate = LocalDate.now(),
-    val time: LocalTime? = null,
-    val remindInterval: ReminderInterval = NONE,
-    val repeatInterval: RepeatInterval = RepeatInterval.NONE,
-    val carryover: Boolean = false,
-    val category: TaskCategory = TaskCategory.OTHER,
+    var name: String = "",
+    var date: LocalDate = LocalDate.now(),
+    var time: LocalTime? = null,
+    var remind: ReminderInterval = NONE,
+    var repeat: RepeatInterval = RepeatInterval.NONE,
+    var carryover: Boolean = false,
+    var category: TaskCategory = TaskCategory.OTHER,
     val subTasks: MutableList<SubTask> = mutableListOf(),
-    val isFinished: Boolean = false,
+    var isFinished: Boolean = false,
     val uuid: UUID = UUID.randomUUID(),
     val requestID: Int = generateRequestID()
 ) {
@@ -57,7 +57,7 @@ data class Task(
 
         //RepeatIntervalの値に応じてタスクを追加
         fun addTaskByRepeatInterval(task: Task) {
-            val date = when (task.repeatInterval) {
+            val date = when (task.repeat) {
                 RepeatInterval.NONE -> null
                 DAILY -> task.date.plusDays(1)
                 WEEKLY -> task.date.plusWeeks(1)
@@ -81,7 +81,7 @@ data class Task(
         fun loadTasks() {
             val gson = GsonUtils.getCustomGson()
             val json = MainActivity.sharedPreferences.getString(Reference.TASK_LIST, null)
-            val type = object: TypeToken<MutableMap<LocalDate, MutableList<Task>>>(){}.type
+            val type = object: TypeToken<MutableList<Task>>(){}.type
             taskList = if (json != null) gson.fromJson(json, type) as MutableList<Task>
             else mutableListOf()
         }
