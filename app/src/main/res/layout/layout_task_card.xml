@@ -6,6 +6,9 @@
         <variable
             name="task"
             type="com.cotrin.todolist.Task" />
+        <variable
+            name="viewModel"
+            type="com.cotrin.todolist.viewModel.TaskViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -45,7 +48,7 @@
                 android:layout_marginTop="6dp"
                 android:maxWidth="220dp"
                 android:maxLines="1"
-                android:text="@string/task_name_hint"
+                android:text="@{task.name}"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -55,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="@string/default_time_text"
+                android:text="@{task.time.toString()}"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
                 app:layout_constraintStart_toEndOf="@+id/taskDate"

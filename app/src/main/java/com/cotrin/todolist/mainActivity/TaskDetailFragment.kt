@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.cotrin.todolist.R
 import com.cotrin.todolist.ReminderInterval
@@ -26,6 +27,7 @@ import com.cotrin.todolist.Task
 import com.cotrin.todolist.TaskCategory
 import com.cotrin.todolist.databinding.FragmentTaskDetailBinding
 import com.cotrin.todolist.utils.Reference
+import com.cotrin.todolist.utils.isNull
 import com.cotrin.todolist.viewModel.MainActivityViewModel
 import com.cotrin.todolist.viewModel.TaskDetailViewModel
 import java.time.LocalDate
@@ -36,9 +38,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
     private val mainViewModel by lazy {
         ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
     }
-    private val taskDetailViewModel by lazy {
-        ViewModelProvider(requireActivity())[TaskDetailViewModel::class.java]
-    }
+    private val taskDetailViewModel: TaskDetailViewModel by viewModels()
     private var position: Int = 0
     private lateinit var mode: String
     private lateinit var listener: OnDialogResultListener
@@ -97,9 +97,10 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         binding.timeBlock.setOnClickListener { showTimePickerDialog() }
         //リマインドブロック
         binding.remindBlock.setOnClickListener {
-            it.isEnabled = false
             showReminderDialog()
         }
+        binding.remindBlock.isEnabled = !task.time.isNull()
+        binding.taskRemindText.isEnabled = !task.time.isNull()
         //リピートブロック
         binding.repeatBlock.setOnClickListener { showRepeatDialog() }
         //繰り越しブロック

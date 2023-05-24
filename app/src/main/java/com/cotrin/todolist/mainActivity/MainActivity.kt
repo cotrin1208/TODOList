@@ -8,12 +8,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import at.grabner.circleprogress.CircleProgressView
 import com.cotrin.todolist.R
@@ -36,10 +36,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
     private lateinit var tabLayout: TabLayout
     private lateinit var dateText: TextView
     private lateinit var binding: ActivityMainBinding
-    private val viewModel by lazy {
-        ViewModelProvider(this)[MainActivityViewModel::class.java]
-    }
-
+    private val mainViewModel: MainActivityViewModel by viewModels()
     companion object {
         var date: LocalDate = LocalDate.now()
         lateinit var sharedPreferences: SharedPreferences
@@ -56,11 +53,6 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
 
         //翌日繰り越し処理
         Task.carryoverPreviousTasks(date)
-
-        //年と月を設定
-        dateText = findViewById<TextView>(R.id.dateText).apply {
-            text = date.format(Reference.YEAR_MONTH_FORMATTER)
-        }
 
         //RecyclerViewの表示
         taskListRecycler = findViewById<RecyclerView?>(R.id.taskListRecyclerView).apply {
@@ -85,7 +77,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                                 when (menuItem.itemId) {
                                     //編集画面の表示
                                     R.id.menu_edit -> {
-                                        viewModel.taskData.value = task
+                                        mainViewModel.taskData.value = task
                                         showTaskDetailFragment(Reference.EDIT, task, position)
                                         true
                                     }
@@ -129,58 +121,18 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                 binding.adapter = this
             }
         }
-        //日付タブ
-        tabLayout = findViewById<TabLayout>(R.id.dateTab).apply {
-            for (i in dateRange) {
-                val text = date.plusDays(i.toLong()).format(Reference.DAY_FORMATTER)
-                addTab(this.newTab().setText(text))
-            }
-
-            addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab) {
-                    date = LocalDate.now().plusDays(tab.position - dateRange.last.toLong())
-                    dateText.text = date.format(Reference.YEAR_MONTH_FORMATTER)
-                    post { smoothScrollTo(tab.view.left - width / 5 * 2, 0) }
-                }
-
-                override fun onTabUnselected(tab: TabLayout.Tab?) {}
-
-                override fun onTabReselected(tab: TabLayout.Tab?) {}
-            })
-
-            post { getTabAt(dateRange.last)?.select() }
-        }
-
-        //カレンダー表示ボタン
-        val showCalendarButton: FloatingActionButton = findViewById(R.id.calendarButton)
-        showCalendarButton.setOnClickListener {
-            showDatePickerDialog()
-        }
-
         //タスク追加ボタンのリスナー登録
-        viewModel.isAddFragmentShown.observe(this) {
+        mainViewModel.isAddFragmentShown.observe(this) {
             if (!it) return@observe
             showTaskDetailFragment(Reference.ADD)
         }
         //タスク編集時のリスナー登録
-        viewModel.isEditFragmentShown.observe(this) {
+        mainViewModel.isEditFragmentShown.observe(this) {
             if (!it) return@observe
 
         }
 
-        binding.viewModel = viewModel
-    }
-
-    //タスク一覧をクリックしたらカレンダーを開く
-    private fun showDatePickerDialog() {
-        DatePickerDialog(this).apply {
-            setOnDateSetListener { _, year, month, dayOfMonth ->
-                val daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.of(year, month + 1, dayOfMonth))
-                tabLayout.getTabAt(daysBetween.toInt() + dateRange.last)?.select()
-                date = LocalDate.of(year, month + 1, dayOfMonth)
-            }
-            show()
-        }
+        binding.viewModel = mainViewModel
     }
 
     //削除ダイアログを表示

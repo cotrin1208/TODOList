@@ -1,14 +1,16 @@
 package com.cotrin.todolist
 
 import com.cotrin.todolist.ReminderInterval.NONE
-import com.cotrin.todolist.RepeatInterval.*
+import com.cotrin.todolist.RepeatInterval.DAILY
+import com.cotrin.todolist.RepeatInterval.MONTHLY
+import com.cotrin.todolist.RepeatInterval.WEEKLY
 import com.cotrin.todolist.mainActivity.MainActivity
 import com.cotrin.todolist.utils.GsonUtils
 import com.cotrin.todolist.utils.Reference
 import com.google.gson.reflect.TypeToken
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.*
+import java.util.UUID
 
 data class Task(
     var name: String = "",

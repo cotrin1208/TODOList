@@ -15,3 +15,7 @@ fun Bundle.getTask(name: String): Task {
     val gson = GsonUtils.getCustomGson()
     return gson.fromJson(json, Task::class.java)
 }
+
+fun <T> T?.isNull(): Boolean {
+    return this == null
+}
