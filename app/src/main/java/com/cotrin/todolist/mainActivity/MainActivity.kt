@@ -1,46 +1,52 @@
 package com.cotrin.todolist.mainActivity
 
+import android.Manifest
+import android.animation.Animator
+import android.animation.ObjectAnimator
 import android.app.AlertDialog
-import android.app.DatePickerDialog
+import android.app.Instrumentation.ActivityResult
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import android.view.View
+import android.provider.Settings
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.viewModels
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
-import at.grabner.circleprogress.CircleProgressView
 import com.cotrin.todolist.R
 import com.cotrin.todolist.Task
+import com.cotrin.todolist.TaskListAdapter
 import com.cotrin.todolist.databinding.ActivityMainBinding
-import com.cotrin.todolist.taskDetailActivity.OnCardClickListener
-import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
 import com.cotrin.todolist.utils.Reference
 import com.cotrin.todolist.utils.putTask
 import com.cotrin.todolist.viewModel.MainActivityViewModel
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.tabs.TabLayout
-import net.cachapa.expandablelayout.ExpandableLayout
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import com.cotrin.todolist.viewModel.TaskViewModel
 import java.util.UUID
 
 class MainActivity : AppCompatActivity(), OnDialogResultListener {
-    private lateinit var taskListRecycler: RecyclerView
-    private lateinit var tabLayout: TabLayout
-    private lateinit var dateText: TextView
     private lateinit var binding: ActivityMainBinding
-    private val mainViewModel: MainActivityViewModel by viewModels()
+    private val mainViewModel: MainActivityViewModel by lazy {
+        ViewModelProvider(this)[MainActivityViewModel::class.java]
+    }
+    private val taskViewModel by lazy {
+        ViewModelProvider(this)[TaskViewModel::class.java]
+    }
     companion object {
-        var date: LocalDate = LocalDate.now()
         lateinit var sharedPreferences: SharedPreferences
-        private val dateRange = -500 .. 500
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,90 +54,43 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.lifecycleOwner = this
 
+        //通知権限の付与
+        checkNotifyPermission()
+
+        //通知処理
+        val builder = NotificationCompat.Builder(this, Reference.APP_ID).apply {
+            setSmallIcon(R.drawable.task_attribute_remind)
+            setContentTitle("リマインダー：タスク名")
+            setContentText("タスクの期限まであと◯◯です")
+            priority = NotificationCompat.PRIORITY_HIGH
+        }
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(0, builder.build())
+
+        //タスクロード
         sharedPreferences = this@MainActivity.getSharedPreferences(Reference.APP_ID, MODE_PRIVATE)
-        Task.loadTasks()
-
+        taskViewModel.loadTasks()
         //翌日繰り越し処理
-        Task.carryoverPreviousTasks(date)
-
+        taskViewModel.carryoverTasks()
         //RecyclerViewの表示
-        taskListRecycler = findViewById<RecyclerView?>(R.id.taskListRecyclerView).apply {
-            TaskListRecyclerAdapter().apply {
-                //RecyclerView内のチェックボックスにリスナー登録、タスク保存
-                setOnCheckBoxClickListener(object: OnItemClickListener {
-                    override fun onItemClick(view: View, position: Int) {
-                        Task.saveTasks()
-                    }
-                })
-                //RecyclerView内のメニューボタンにリスナー登録
-                setOnTaskDetailClickListener(object: OnItemClickListener {
-                    override fun onItemClick(view: View, position: Int) {
-                        PopupMenu(this@MainActivity, view).apply {
-                            inflate(R.menu.popup_menu_task)
-                            menu::class.java.getDeclaredMethod("setOptionalIconsVisible", Boolean::class.java).apply {
-                                isAccessible = true
-                                invoke(menu, true)
-                            }
-                            setOnMenuItemClickListener { menuItem ->
-                                val task = Task.taskList[position]
-                                when (menuItem.itemId) {
-                                    //編集画面の表示
-                                    R.id.menu_edit -> {
-                                        mainViewModel.taskData.value = task
-                                        showTaskDetailFragment(Reference.EDIT, task, position)
-                                        true
-                                    }
-                                    //タスクを複製する
-                                    R.id.menu_copy -> {
-                                        onDialogResult(task.copy(uuid = UUID.randomUUID()), position, Reference.ADD)
-                                        true
-                                    }
-                                    //削除ダイアログの表示
-                                    R.id.menu_delete -> {
-                                        showDeleteAlertDialog {
-                                            Task.removeTaskByUUID(task.uuid)
-                                            notifyItemRemoved(position)
-                                            notifyItemRangeChanged(position, itemCount)
-                                            Task.saveTasks()
-                                        }
-                                        true
-                                    }
-                                    else -> false
-                                }
-                            }
-                        }.show()
-                    }
-                })
-                //RecyclerViewの行Viewにリスナー登録
-                setOnTaskClickListener(object: OnCardClickListener {
-                    override fun onItemClick(el: ExpandableLayout, position: Int) {
-                        el.toggle()
-                    }
-                })
-                //プログレスバー更新リスナー登録
-                setProgressChangeListener(object: OnItemClickListener {
-                    override fun onItemClick(view: View, position: Int) {
-                        val task = Task.taskList[position]
-                        val isFinish: Boolean = if (view is CircleProgressView) {
-                            view.maxValue == view.currentValue
-                        } else false
-                        Task.taskList[position] = task.copy(isFinished = isFinish)
-                    }
-                })
-                binding.adapter = this
-            }
+        binding.adapter = TaskListAdapter(this@MainActivity, taskViewModel).apply {
+            submitList(taskViewModel.taskList.value)
         }
         //タスク追加ボタンのリスナー登録
         mainViewModel.isAddFragmentShown.observe(this) {
             if (!it) return@observe
             showTaskDetailFragment(Reference.ADD)
         }
-        //タスク編集時のリスナー登録
-        mainViewModel.isEditFragmentShown.observe(this) {
-            if (!it) return@observe
-
+        //タスクリスト更新処理
+        taskViewModel.taskList.observe(this) {
+            binding.adapter?.submitList(it)
+            taskViewModel.saveTasks()
         }
-
+        //タスク詳細ポップアップメニュー
+        taskViewModel.isDetailShown.observe(this) {
+            if (!it) return@observe
+            showTaskDetailPopupMenu()
+        }
         binding.viewModel = mainViewModel
     }
 
@@ -154,29 +113,100 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         }.show()
     }
 
-    private fun showTaskDetailFragment(mode: String, task: Task? = null, position: Int? = null) {
+    private fun showTaskDetailFragment(mode: String, task: Task? = null) {
         TaskDetailFragment().apply {
             val args = Bundle()
             task?.let { args.putTask(Reference.TASK, it) }
                 ?: run { args.putTask(Reference.TASK, Task()) }
-            position?.let { args.putInt(Reference.POSITION, it) }
             arguments = args
         }.show(supportFragmentManager, mode)
     }
 
-    override fun onDialogResult(task: Task, position: Int, mode: String) {
-        val adapter = binding.adapter as TaskListRecyclerAdapter
-        if (mode == Reference.ADD) {
-            Task.addTask(task)
-            if (adapter.itemCount == 0) {
-                adapter.notifyDataSetChanged()
-            } else {
-                adapter.notifyItemInserted(adapter.itemCount - 1)
+    private fun showTaskDetailPopupMenu() {
+        val view = taskViewModel.taskDetail.value!!.first
+        PopupMenu(this@MainActivity, view).apply {
+            inflate(R.menu.popup_menu_task)
+            menu::class.java.getDeclaredMethod("setOptionalIconsVisible", Boolean::class.java).apply {
+                isAccessible = true
+                invoke(menu, true)
             }
-            Toast.makeText(this@MainActivity, "ADD", Toast.LENGTH_SHORT).show()
-        } else if (mode == Reference.EDIT) {
-            Task.editTask(position, task)
-            adapter.notifyItemChanged(position)
+            //回転アニメーション
+            ObjectAnimator.ofFloat(view, "rotation", 0f, -90f).apply {
+                duration = 300
+                addListener(object: Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) {}
+
+                    override fun onAnimationEnd(animation: Animator) { view.rotation = -90f }
+
+                    override fun onAnimationCancel(animation: Animator) {}
+
+                    override fun onAnimationRepeat(animation: Animator) {}
+                })
+            }.start()
+            //クリックリスナー
+            setOnMenuItemClickListener { menuItem ->
+                val task = taskViewModel.taskDetail.value!!.second
+                when (menuItem.itemId) {
+                    //編集画面の表示
+                    R.id.menu_edit -> {
+                        mainViewModel.taskData.value = task
+                        showTaskDetailFragment(Reference.EDIT, task)
+                        true
+                    }
+                    //タスクを複製する
+                    R.id.menu_copy -> {
+                        onDialogResult(task.copy(uuid = UUID.randomUUID()), Reference.ADD)
+                        true
+                    }
+                    //削除ダイアログの表示
+                    R.id.menu_delete -> {
+                        showDeleteAlertDialog {
+                            taskViewModel.deleteTask(task)
+                            taskViewModel.saveTasks()
+                        }
+                        true
+                    }
+                    else -> false
+                }
+            }
+            //閉じたときにアニメーションをもとに戻す
+            setOnDismissListener {
+                ObjectAnimator.ofFloat(view, "rotation", -90f, 0f).apply {
+                    duration = 300
+                    addListener(object: Animator.AnimatorListener {
+                        override fun onAnimationStart(animation: Animator) {}
+
+                        override fun onAnimationEnd(animation: Animator) { view.rotation = 0f }
+
+                        override fun onAnimationCancel(animation: Animator) {}
+
+                        override fun onAnimationRepeat(animation: Animator) {}
+                    })
+                }.start()
+            }
+        }.show()
+    }
+
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(Reference.APP_ID, "リマインダー", NotificationManager.IMPORTANCE_HIGH).apply {
+            description = "タスクリマインダー"
         }
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        manager?.createNotificationChannel(channel)
+    }
+
+    private fun checkNotifyPermission() {
+        //Android13未満は通知権限不要
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 123)
+    }
+
+    override fun onDialogResult(task: Task, mode: String) {
+        if (mode == Reference.ADD) {
+            taskViewModel.addTask(task)
+        } else if (mode == Reference.EDIT) {
+            taskViewModel.editTask(task)
+        }
+        Toast.makeText(this, mode, Toast.LENGTH_SHORT).show()
     }
 }

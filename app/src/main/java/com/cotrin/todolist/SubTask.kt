@@ -1,6 +1,6 @@
 package com.cotrin.todolist
 
 data class SubTask(
-    val name: String = "",
-    val isFinished: Boolean = false
+    var name: String = "",
+    var isFinished: Boolean = false
     )

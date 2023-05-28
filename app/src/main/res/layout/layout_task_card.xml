@@ -1,4 +1,5 @@
-<layout xmlns:tools="http://schemas.android.com/tools"
+<layout
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -18,6 +19,7 @@
         android:layout_margin="8dp"
         android:clickable="true"
         android:stateListAnimator="@animator/animator_push_down"
+        android:onClick="@{viewModel.onTaskCardClick}"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp">
 
@@ -36,6 +38,7 @@
                 android:scaleY="0.7"
                 android:stateListAnimator="@animator/animator_checkbox"
                 android:checked="@{task.finished}"
+                android:onClick="@{() -> viewModel.onChecked(task)}"
                 app:layout_constraintEnd_toStartOf="@+id/taskDate"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -58,7 +61,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="@{task.time.toString()}"
+                android:text="@{task.timeText}"
+                android:visibility="@{task.visibilityTimeText}"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
                 app:layout_constraintStart_toEndOf="@+id/taskDate"
@@ -68,20 +72,20 @@
                 android:id="@+id/taskDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/default_date_text"
+                android:text="@{task.dateText}"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
                 app:layout_constraintStart_toStartOf="@+id/taskName"
                 app:layout_constraintTop_toBottomOf="@+id/taskName" />
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/taskMenuButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="11dp"
                 android:layout_marginEnd="24dp"
                 android:background="@null"
-                android:stateListAnimator="@animator/animator_push_down"
+                android:onClick="@{(view) -> viewModel.onTaskDetailClick(view, task)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/menu_icon" />
@@ -110,9 +114,9 @@
 
             <com.google.android.material.chip.ChipGroup
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="34dp"
+                android:layout_marginTop="30dp"
                 app:chipSpacingHorizontal="-2dp"
                 app:layout_constraintStart_toEndOf="@+id/taskTime"
                 app:layout_constraintTop_toTopOf="parent">
@@ -120,7 +124,7 @@
                 <com.google.android.material.chip.Chip
                     android:id="@+id/categoryChip"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="-12dp"
                     android:layout_marginTop="34dp"
                     android:layout_marginEnd="1dp"
@@ -135,9 +139,10 @@
                 <com.google.android.material.chip.Chip
                     android:id="@+id/remindChip"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="-6dp"
-                    android:text="15分前"
+                    android:text="@{task.remind.optionName}"
+                    android:visibility="@{task.visibilityRemindIcon}"
                     android:textSize="8sp"
                     app:chipBackgroundColor="@color/chip_bg"
                     app:chipIcon="@drawable/task_attribute_remind"
@@ -150,9 +155,10 @@
                 <com.google.android.material.chip.Chip
                     android:id="@+id/repeatChip"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="4dp"
-                    android:text="毎週"
+                    android:text="@{task.repeat.optionName}"
+                    android:visibility="@{task.visibilityRepeatIcon}"
                     android:textSize="8sp"
                     app:chipBackgroundColor="@color/chip_bg"
                     app:chipIcon="@drawable/task_attribute_repeat"
@@ -165,8 +171,9 @@
                 <com.google.android.material.chip.Chip
                     android:id="@+id/carryoverChip"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="-8dp"
+                    android:visibility="@{task.visibilityCarryoverIcon}"
                     app:chipBackgroundColor="@color/chip_bg"
                     app:chipIcon="@drawable/task_attribute_carryover"
                     app:chipIconSize="16dp"
@@ -232,6 +239,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="4dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         app:layout_constraintBottom_toTopOf="@+id/addSubTask"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"

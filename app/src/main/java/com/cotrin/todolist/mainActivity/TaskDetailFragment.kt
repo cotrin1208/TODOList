@@ -26,7 +26,6 @@ import com.cotrin.todolist.RepeatInterval
 import com.cotrin.todolist.Task
 import com.cotrin.todolist.TaskCategory
 import com.cotrin.todolist.databinding.FragmentTaskDetailBinding
-import com.cotrin.todolist.utils.Reference
 import com.cotrin.todolist.utils.isNull
 import com.cotrin.todolist.viewModel.MainActivityViewModel
 import com.cotrin.todolist.viewModel.TaskDetailViewModel
@@ -39,15 +38,11 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
     }
     private val taskDetailViewModel: TaskDetailViewModel by viewModels()
-    private var position: Int = 0
     private lateinit var mode: String
     private lateinit var listener: OnDialogResultListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        arguments?.let {
-            position = requireArguments().getInt(Reference.POSITION, 0)
-        }
         mode = tag as String
 
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_task_detail, container, false)
@@ -124,7 +119,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
         //タスク登録ボタン
         binding.applyTaskButton.apply {
             setOnClickListener {
-                listener.onDialogResult(mainViewModel.taskData.value!!, position, mode)
+                listener.onDialogResult(mainViewModel.taskData.value!!, mode)
                 dismiss()
             }
         }

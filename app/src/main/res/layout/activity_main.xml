@@ -8,7 +8,7 @@
 
         <variable
             name="adapter"
-            type="com.cotrin.todolist.mainActivity.TaskListRecyclerAdapter" />
+            type="com.cotrin.todolist.TaskListAdapter" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
