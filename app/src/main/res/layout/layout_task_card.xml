@@ -61,7 +61,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="@{task.timeText}"
-                android:textColor="@{viewModel.isBeforeTime(task) ? @android:color/holo_red_dark : @android:color/secondary_text_dark}"
                 android:textSize="10sp"
                 android:visibility="@{task.visibilityTimeText}"
                 app:layout_constraintBottom_toTopOf="@+id/expandableLayout"

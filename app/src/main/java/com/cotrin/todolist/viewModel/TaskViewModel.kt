@@ -158,8 +158,4 @@ class TaskViewModel(application: Application): AndroidViewModel(application) {
     fun isBeforeDate(task: Task): Boolean {
         return task.date.isBefore(LocalDate.now())
     }
-
-    fun isBeforeTime(task: Task): Boolean {
-        return task.time?.isBefore(LocalTime.now()) ?: run { true }
-    }
 }
