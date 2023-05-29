@@ -36,7 +36,6 @@
                 android:layout_height="wrap_content"
                 android:scaleX="0.7"
                 android:scaleY="0.7"
-                android:stateListAnimator="@animator/animator_checkbox"
                 android:checked="@{task.finished}"
                 android:onClick="@{() -> viewModel.onChecked(task)}"
                 app:layout_constraintEnd_toStartOf="@+id/taskDate"
@@ -62,21 +61,25 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="@{task.timeText}"
-                android:visibility="@{task.visibilityTimeText}"
+                android:textColor="@{viewModel.isBeforeTime(task) ? @android:color/holo_red_dark : @android:color/secondary_text_dark}"
                 android:textSize="10sp"
+                android:visibility="@{task.visibilityTimeText}"
                 app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
                 app:layout_constraintStart_toEndOf="@+id/taskDate"
-                app:layout_constraintTop_toBottomOf="@+id/taskName" />
+                app:layout_constraintTop_toBottomOf="@+id/taskName"
+                app:layout_constraintVertical_bias="0.4" />
 
             <TextView
                 android:id="@+id/taskDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{task.dateText}"
+                android:textColor="@{viewModel.isBeforeDate(task) ? @android:color/holo_red_dark : @android:color/secondary_text_dark}"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toTopOf="@+id/expandableLayout"
                 app:layout_constraintStart_toStartOf="@+id/taskName"
-                app:layout_constraintTop_toBottomOf="@+id/taskName" />
+                app:layout_constraintTop_toBottomOf="@+id/taskName"
+                app:layout_constraintVertical_bias="0.4" />
 
             <ImageView
                 android:id="@+id/taskMenuButton"

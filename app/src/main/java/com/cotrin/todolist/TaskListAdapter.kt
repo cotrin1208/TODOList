@@ -6,17 +6,34 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.cotrin.todolist.databinding.LayoutTaskCardBinding
 import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
 import com.cotrin.todolist.taskDetailActivity.OnTextChangeListener
 import com.cotrin.todolist.viewModel.TaskViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TaskListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
     private val viewModel: TaskViewModel
     ): ListAdapter<Task, TaskListAdapter.TaskViewHolder>(DiffCallBack) {
+    companion object {
+        //差分コールバックをprivateで定義
+        private val DiffCallBack = object: DiffUtil.ItemCallback<Task>() {
+            override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
+                return oldItem.uuid == newItem.uuid
+            }
+
+            override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -35,6 +52,33 @@ class TaskListAdapter(
                 this.viewModel = viewModel
                 executePendingBindings()
             }
+
+            val progressBar = binding.progressBar
+            progressBar.maxValue = if (task.subTasks.size == 0) 1f else task.subTasks.size.toFloat()
+            progressBar.setValueAnimated(task.subTasks.count { it.isFinished }.toFloat(), 200)
+
+            fun updateProgress() {
+                progressBar.maxValue = if (task.subTasks.size == 0) 1f else task.subTasks.size.toFloat()
+                progressBar.setValueAnimated(task.subTasks.count { it.isFinished }.toFloat(), 200)
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    //アニメーションが終わるまで待つ
+                    delay(250)
+                    //サブタスクが無い場合はブロックを抜ける
+                    if (task.subTasks.isEmpty()) return@launch
+                    //プログレスバーが100%になったとき
+                    if (progressBar.maxValue == progressBar.currentValue) {
+                        //タスクを完了する
+                        if (!task.isFinished) viewModel.editTask(task.copy(isFinished = true))
+                        //プログレスバーが100%から変動したとき
+                    } else {
+                        //タスクを未達にする
+                        if (task.isFinished) viewModel.editTask(task.copy(isFinished = false))
+                    }
+                }
+            }
+            updateProgress()
+
             //アコーディオンの設定
             binding.expandableLayout.setExpanded(viewModel.isExpansion.value!!, false)
             //カテゴリアイコン設定
@@ -52,6 +96,7 @@ class TaskListAdapter(
                     override fun onItemClick(view: View, position: Int) {
                         task.subTasks[position].isFinished = (view as CheckBox).isChecked
                         viewModel.saveTasks()
+                        updateProgress()
                     }
                 })
                 //テキストリスナー登録
@@ -68,6 +113,7 @@ class TaskListAdapter(
                         notifyItemRemoved(position)
                         notifyItemRangeChanged(position, itemCount)
                         viewModel.saveTasks()
+                        updateProgress()
                     }
                 })
             }

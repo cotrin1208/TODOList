@@ -11,7 +11,9 @@ import com.cotrin.todolist.utils.GsonUtils
 import com.cotrin.todolist.utils.Reference
 import com.google.gson.reflect.TypeToken
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.util.UUID
 
 data class Task(
@@ -43,6 +45,13 @@ data class Task(
     fun toJsonString(): String {
         val gson = GsonUtils.getCustomGson()
         return gson.toJson(this)
+    }
+
+    fun getRemindTimeInMills(): Long {
+        val remindDateTime = LocalDateTime.of(date, time)
+        val reminderTime = remindDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val intervalMills = remind.minute * 60 * 1000
+        return reminderTime - intervalMills
     }
 
     fun getDateText(): String {

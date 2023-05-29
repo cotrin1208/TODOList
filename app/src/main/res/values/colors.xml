@@ -11,4 +11,5 @@
     <color name="card_background">#F0F0F0</color>
     <color name="chip_bg">@android:color/background_light</color>
     <color name="chip_stroke">#919191</color>
+    <color name="defaultTextColor">#8A000000</color>
 </resources>

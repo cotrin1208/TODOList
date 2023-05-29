@@ -4,26 +4,17 @@ import android.Manifest
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.app.AlertDialog
-import android.app.Instrumentation.ActivityResult
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -55,23 +46,14 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         binding.lifecycleOwner = this
 
         //通知権限の付与
-        checkNotifyPermission()
-
-        //通知処理
-        val builder = NotificationCompat.Builder(this, Reference.APP_ID).apply {
-            setSmallIcon(R.drawable.task_attribute_remind)
-            setContentTitle("リマインダー：タスク名")
-            setContentText("タスクの期限まであと◯◯です")
-            priority = NotificationCompat.PRIORITY_HIGH
-        }
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(0, builder.build())
-
+        checkPermission()
         //タスクロード
         sharedPreferences = this@MainActivity.getSharedPreferences(Reference.APP_ID, MODE_PRIVATE)
         taskViewModel.loadTasks()
         //翌日繰り越し処理
         taskViewModel.carryoverTasks()
+        //リピート処理
+        taskViewModel.repeatTasks()
         //RecyclerViewの表示
         binding.adapter = TaskListAdapter(this@MainActivity, taskViewModel).apply {
             submitList(taskViewModel.taskList.value)
@@ -155,7 +137,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                     }
                     //タスクを複製する
                     R.id.menu_copy -> {
-                        onDialogResult(task.copy(uuid = UUID.randomUUID()), Reference.ADD)
+                        taskViewModel.copyTask(task)
                         true
                     }
                     //削除ダイアログの表示
@@ -195,10 +177,11 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         manager?.createNotificationChannel(channel)
     }
 
-    private fun checkNotifyPermission() {
+    private fun checkPermission() {
         //Android13未満は通知権限不要
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-        requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 123)
+        val permissions = arrayOf(Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.SCHEDULE_EXACT_ALARM)
+        requestPermissions(permissions, 123)
     }
 
     override fun onDialogResult(task: Task, mode: String) {

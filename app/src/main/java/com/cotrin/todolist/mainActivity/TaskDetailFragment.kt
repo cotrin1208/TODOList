@@ -153,7 +153,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
             0, 0, true).apply {
                 setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.remove_time)) { _, _ ->
                     taskDetailViewModel.time.value = null
-                    binding.taskRemindText.text = ReminderInterval.NONE.OptionName
+                    binding.taskRemindText.text = ReminderInterval.NONE.optionName
                     binding.remindBlock.isEnabled = false
                     binding.taskRemindText.isEnabled = false
                 }
@@ -163,7 +163,7 @@ class TaskDetailFragment: DialogFragment(R.layout.fragment_task_detail) {
     }
 
     private fun showReminderDialog() {
-        val reminderOptions = enumValues<ReminderInterval>().map { it.OptionName }.toTypedArray()
+        val reminderOptions = enumValues<ReminderInterval>().map { it.optionName }.toTypedArray()
         AlertDialog.Builder(requireContext()).apply {
             setTitle("リマインダーを設定")
             setItems(reminderOptions) { _, option ->
