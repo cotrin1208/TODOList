@@ -83,14 +83,21 @@ class TaskViewModel(application: Application): AndroidViewModel(application) {
             task.date.isBefore(currentDate) && !task.isFinished && task.carryover
         }
         tasksToCarryOver.forEach { task ->
-            val updatedTask = task.copy(date = currentDate)
-            editTask(updatedTask)
+            val date = when (task.repeat) {
+                NONE -> return@forEach
+                DAILY -> task.date.plusDays(1)
+                WEEKLY -> task.date.plusWeeks(1)
+                MONTHLY -> task.date.plusMonths(1)
+            }
+            if (date == LocalDate.now()) return@forEach
+            val carryoverTask = task.copy(date = LocalDate.now())
+            setRemindNotification(carryoverTask)
         }
     }
 
     fun repeatTasks() {
         taskList.value!!.filter { task ->
-            task.isFinished && task.repeat != NONE
+            task.date.isBefore(LocalDate.now()) && task.isFinished && task.repeat != NONE
         }.forEach { task ->
             val date = when (task.repeat) {
                 NONE -> task.date
@@ -102,6 +109,7 @@ class TaskViewModel(application: Application): AndroidViewModel(application) {
                 subtask.copy(isFinished = false)
             }
             copyTask(task.copy(date = date, isFinished = false, subTasks = subTaskList.toMutableList()))
+            deleteTask(task)
         }
     }
 
@@ -152,6 +160,10 @@ class TaskViewModel(application: Application): AndroidViewModel(application) {
         editTask(task.copy(isFinished = !isFinish))
         if (!isFinish) cancelRemindNotification(task)
         else setRemindNotification(task)
+        task.subTasks.forEach {
+            it.isFinished = !isFinish
+        }
+        editTask(task)
         taskList.value = taskList.value?.toList()
     }
 

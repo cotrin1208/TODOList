@@ -89,6 +89,7 @@ class TaskListAdapter(
                 task.subTasks.add(SubTask())
                 binding.subTasks.adapter?.notifyItemInserted(task.subTasks.size - 1)
                 viewModel.saveTasks()
+                updateProgress()
             }
             binding.subTasks.adapter = SubTaskAdapter(task.subTasks).apply {
                 //チェックボックスリスナー登録
