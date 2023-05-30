@@ -20,7 +20,7 @@ class TaskReminderReceiver: BroadcastReceiver() {
         val pendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(context, Reference.APP_ID).apply {
-            setSmallIcon(R.drawable.task_attribute_remind)
+            setSmallIcon(R.drawable.notification_icon)
             setContentTitle("リマインダー：$taskName")
             setContentText(reminderInterval.notifyMessage)
             setContentIntent(pendingIntent)
