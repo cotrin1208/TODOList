@@ -12,19 +12,16 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.cotrin.todolist.BuildConfig
 import com.cotrin.todolist.R
 import com.cotrin.todolist.model.Task
 import com.cotrin.todolist.TaskListAdapter
 import com.cotrin.todolist.databinding.ActivityMainBinding
 import com.cotrin.todolist.utils.Reference
-import com.cotrin.todolist.utils.putTask
 import com.cotrin.todolist.viewModel.MainActivityViewModel
 import com.cotrin.todolist.viewModel.TaskViewModel
 
@@ -96,13 +93,8 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         }.show()
     }
 
-    private fun showTaskDetailFragment(mode: String, task: Task? = null) {
-        TaskDetailFragment().apply {
-            val args = Bundle()
-            task?.let { args.putTask(Reference.TASK, it) }
-                ?: run { args.putTask(Reference.TASK, Task()) }
-            arguments = args
-        }.show(supportFragmentManager, mode)
+    private fun showTaskDetailFragment(mode: String) {
+        TaskDetailFragment().show(supportFragmentManager, mode)
     }
 
     private fun showTaskDetailPopupMenu() {
@@ -133,7 +125,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                     //編集画面の表示
                     R.id.menu_edit -> {
                         mainViewModel.taskData.value = task
-                        showTaskDetailFragment(Reference.EDIT, task)
+                        showTaskDetailFragment(Reference.EDIT)
                         true
                     }
                     //タスクを複製する
@@ -196,6 +188,5 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         } else if (mode == Reference.EDIT) {
             taskViewModel.editTask(task)
         }
-        Toast.makeText(this, mode, Toast.LENGTH_SHORT).show()
     }
 }

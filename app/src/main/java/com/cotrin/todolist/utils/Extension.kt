@@ -1,18 +1,22 @@
 package com.cotrin.todolist.utils
 
-import android.os.Bundle
-import com.cotrin.todolist.model.Task
-
-fun Bundle.putTask(name: String, task: Task) {
-    this.putString(name, task.toJsonString())
-}
-
-fun Bundle.getTask(name: String): Task {
-    val json = this.getString(name, Task().toJsonString())
-    val gson = GsonUtils.getCustomGson()
-    return gson.fromJson(json, Task::class.java)
-}
+import java.time.LocalDate
 
 fun <T> T?.isNull(): Boolean {
     return this == null
+}
+
+fun LocalDate.getDayOfWeekText(): String {
+    val dateText = this.format(Reference.DAY_FORMATTER)
+    val dayOfWeek = when (this.dayOfWeek.value) {
+        1 -> "月"
+        2 -> "火"
+        3 -> "水"
+        4 -> "木"
+        5 -> "金"
+        6 -> "土"
+        7 -> "日"
+        else -> ""
+    }
+    return "$dateText ($dayOfWeek)"
 }

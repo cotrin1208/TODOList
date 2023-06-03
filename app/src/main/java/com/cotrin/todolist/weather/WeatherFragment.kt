@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -12,16 +11,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.cotrin.todolist.R
 import com.cotrin.todolist.databinding.FragmentWeatherBinding
-import com.cotrin.todolist.utils.Reference
+import com.cotrin.todolist.utils.getDayOfWeekText
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.highlight.Highlight
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -75,12 +71,15 @@ class WeatherFragment : Fragment() {
             binding.weatherChart.apply {
                 //データをセット
                 data = lineData
-                setVisibleXRangeMaximum(8f)
+                //一画面の情報を8個に指定
+                setVisibleXRangeMaximum(7.5f)
+                //データが無いときのテキスト設定
+                setNoDataText("天気情報をロード中")
                 //背景グリッドを設定
                 setDrawGridBackground(false)
                 //日付をまたぐ箇所に破線を表示
                 for (i in 1 .. 5) {
-                    val limitLineText = LocalDate.now().plusDays(i.toLong()).format(Reference.DAY_FORMATTER)
+                    val limitLineText = LocalDate.now().plusDays(i.toLong()).getDayOfWeekText()
                     val limitLineIndex = (24 * i - weatherViewModel.getStartTime()) / 3f
                     val limitLine = LimitLine(limitLineIndex, limitLineText).apply {
                         lineColor = ContextCompat.getColor(requireContext(), android.R.color.tab_indicator_text)
@@ -119,7 +118,7 @@ class WeatherFragment : Fragment() {
                 setScaleEnabled(false)
                 setPinchZoom(false)
                 //色を設定
-                xAxis.textColor = ContextCompat.getColor(requireContext(), android.R.color.tab_indicator_text)
+                xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.weatherIconColor)
                 axisRight.textColor = ContextCompat.getColor(requireContext(), android.R.color.tab_indicator_text)
                 axisLeft.textColor = ContextCompat.getColor(requireContext(), android.R.color.tab_indicator_text)
                 //再描画

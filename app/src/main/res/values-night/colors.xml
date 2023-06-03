@@ -12,4 +12,5 @@
     <color name="chip_bg">#444444</color>
     <color name="chip_stroke">#3C3C3C</color>
     <color name="defaultTextColor">#F0F0F0</color>
+    <color name="weatherIconColor">#00FFFF</color>
 </resources>

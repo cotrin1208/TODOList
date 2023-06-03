@@ -50,7 +50,7 @@ class WeatherViewModel(application: Application): AndroidViewModel(application) 
     suspend fun setResultData(result: WeatherApiService) {
         withContext(Dispatchers.IO) {
             //天気情報を取得
-            val get = result.getWeatherData(lat, lon, "ja", BuildConfig.WEATHER_API_KEY, 70, "metric")
+            val get = result.getWeatherData(lat, lon, "ja", BuildConfig.WEATHER_API_KEY, 40, "metric")
             get.enqueue(object : Callback<WeatherData> {
                 override fun onResponse(call: Call<WeatherData>, response: Response<WeatherData>) {
                     val weatherData = response.body()
