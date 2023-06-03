@@ -18,15 +18,15 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.cotrin.todolist.BuildConfig
 import com.cotrin.todolist.R
-import com.cotrin.todolist.Task
+import com.cotrin.todolist.model.Task
 import com.cotrin.todolist.TaskListAdapter
 import com.cotrin.todolist.databinding.ActivityMainBinding
 import com.cotrin.todolist.utils.Reference
 import com.cotrin.todolist.utils.putTask
 import com.cotrin.todolist.viewModel.MainActivityViewModel
 import com.cotrin.todolist.viewModel.TaskViewModel
-import java.util.UUID
 
 class MainActivity : AppCompatActivity(), OnDialogResultListener {
     private lateinit var binding: ActivityMainBinding
@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
 
         //通知権限の付与
         checkPermission()
+        createNotificationChannel()
         //タスクロード
         sharedPreferences = this@MainActivity.getSharedPreferences(Reference.APP_ID, MODE_PRIVATE)
         taskViewModel.loadTasks()
@@ -180,7 +181,12 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
     private fun checkPermission() {
         //Android13未満は通知権限不要
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-        val permissions = arrayOf(Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.SCHEDULE_EXACT_ALARM)
+        val permissions = arrayOf(
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.SCHEDULE_EXACT_ALARM,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
         requestPermissions(permissions, 123)
     }
 

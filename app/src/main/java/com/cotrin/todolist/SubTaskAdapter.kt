@@ -6,8 +6,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.cotrin.todolist.databinding.LayoutSubTaskBinding
-import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
-import com.cotrin.todolist.taskDetailActivity.OnTextChangeListener
+import com.cotrin.todolist.listener.OnItemClickListener
+import com.cotrin.todolist.listener.OnTextChangeListener
+import com.cotrin.todolist.model.SubTask
 
 class SubTaskAdapter(private val subTasks: List<SubTask>): RecyclerView.Adapter<SubTaskAdapter.SubTaskViewHolder>() {
     private lateinit var checkBoxClickListener: OnItemClickListener

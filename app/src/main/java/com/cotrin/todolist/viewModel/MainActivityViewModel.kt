@@ -2,7 +2,7 @@ package com.cotrin.todolist.viewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.cotrin.todolist.Task
+import com.cotrin.todolist.model.Task
 
 class MainActivityViewModel: ViewModel() {
     val taskList = MutableLiveData<List<Task>>(listOf())

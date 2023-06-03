@@ -1,7 +1,7 @@
 package com.cotrin.todolist.utils
 
 import android.os.Bundle
-import com.cotrin.todolist.Task
+import com.cotrin.todolist.model.Task
 
 fun Bundle.putTask(name: String, task: Task) {
     this.putString(name, task.toJsonString())

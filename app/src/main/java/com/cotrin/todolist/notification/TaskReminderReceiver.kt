@@ -1,4 +1,4 @@
-package com.cotrin.todolist
+package com.cotrin.todolist.notification
 
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -6,7 +6,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import com.cotrin.todolist.ReminderInterval.*
+import com.cotrin.todolist.R
+import com.cotrin.todolist.model.ReminderInterval.*
 import com.cotrin.todolist.mainActivity.MainActivity
 import com.cotrin.todolist.utils.Reference
 

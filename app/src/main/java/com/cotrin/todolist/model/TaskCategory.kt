@@ -1,4 +1,6 @@
-package com.cotrin.todolist
+package com.cotrin.todolist.model
+
+import com.cotrin.todolist.R
 
 enum class TaskCategory(val categoryName: String, val iconResId: Int) {
     OTHER("カテゴリ無し", R.drawable.task_category_other),

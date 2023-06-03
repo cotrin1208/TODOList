@@ -2,15 +2,12 @@ package com.cotrin.todolist.viewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.cotrin.todolist.ReminderInterval
-import com.cotrin.todolist.RepeatInterval
-import com.cotrin.todolist.SubTask
-import com.cotrin.todolist.Task
-import com.cotrin.todolist.TaskCategory
+import com.cotrin.todolist.model.ReminderInterval
+import com.cotrin.todolist.model.RepeatInterval
+import com.cotrin.todolist.model.TaskCategory
 import com.cotrin.todolist.utils.Reference
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.UUID
 
 class TaskDetailViewModel: ViewModel() {
     val name = MutableLiveData("")

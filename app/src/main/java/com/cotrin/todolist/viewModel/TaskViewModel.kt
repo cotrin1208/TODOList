@@ -9,12 +9,10 @@ import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.cotrin.todolist.R
-import com.cotrin.todolist.ReminderInterval
-import com.cotrin.todolist.RepeatInterval
-import com.cotrin.todolist.RepeatInterval.*
-import com.cotrin.todolist.SubTask
-import com.cotrin.todolist.Task
-import com.cotrin.todolist.TaskReminderReceiver
+import com.cotrin.todolist.model.ReminderInterval
+import com.cotrin.todolist.model.RepeatInterval.*
+import com.cotrin.todolist.model.Task
+import com.cotrin.todolist.notification.TaskReminderReceiver
 import com.cotrin.todolist.mainActivity.MainActivity
 import com.cotrin.todolist.utils.GsonUtils
 import com.cotrin.todolist.utils.Reference

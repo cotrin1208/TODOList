@@ -21,10 +21,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.cotrin.todolist.R
-import com.cotrin.todolist.ReminderInterval
-import com.cotrin.todolist.RepeatInterval
-import com.cotrin.todolist.Task
-import com.cotrin.todolist.TaskCategory
+import com.cotrin.todolist.model.ReminderInterval
+import com.cotrin.todolist.model.RepeatInterval
+import com.cotrin.todolist.model.Task
+import com.cotrin.todolist.model.TaskCategory
 import com.cotrin.todolist.databinding.FragmentTaskDetailBinding
 import com.cotrin.todolist.utils.isNull
 import com.cotrin.todolist.viewModel.MainActivityViewModel

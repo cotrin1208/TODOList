@@ -1,4 +1,4 @@
-package com.cotrin.todolist
+package com.cotrin.todolist.model
 
 enum class ReminderInterval(val minute: Int, val optionName: String, val notifyMessage: String) {
     NONE(-1, "リマインダー無し", ""),

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="task"
-            type="com.cotrin.todolist.Task" />
+            type="com.cotrin.todolist.model.Task" />
         <variable
             name="viewModel"
             type="com.cotrin.todolist.viewModel.TaskViewModel" />

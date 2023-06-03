@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.cotrin.todolist.databinding.LayoutTaskCardBinding
-import com.cotrin.todolist.taskDetailActivity.OnItemClickListener
-import com.cotrin.todolist.taskDetailActivity.OnTextChangeListener
+import com.cotrin.todolist.listener.OnItemClickListener
+import com.cotrin.todolist.listener.OnTextChangeListener
+import com.cotrin.todolist.model.SubTask
+import com.cotrin.todolist.model.Task
 import com.cotrin.todolist.viewModel.TaskViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

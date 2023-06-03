@@ -1,6 +1,6 @@
 package com.cotrin.todolist.mainActivity
 
-import com.cotrin.todolist.Task
+import com.cotrin.todolist.model.Task
 
 interface OnDialogResultListener {
     fun onDialogResult(task: Task, mode: String)

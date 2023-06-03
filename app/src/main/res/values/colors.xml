@@ -12,4 +12,5 @@
     <color name="chip_bg">@android:color/background_light</color>
     <color name="chip_stroke">#919191</color>
     <color name="defaultTextColor">#8A000000</color>
+    <color name="weatherIconColor">#00FFFF</color>
 </resources>
