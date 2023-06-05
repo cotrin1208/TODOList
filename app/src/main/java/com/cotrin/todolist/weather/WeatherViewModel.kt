@@ -56,7 +56,7 @@ class WeatherViewModel(application: Application): AndroidViewModel(application) 
                     val weatherData = response.body()
                     //早期リターン
                     weatherData ?: return
-                    weatherLiveData.value = weatherData
+                    weatherLiveData.postValue(weatherData)
                 }
 
                 override fun onFailure(call: Call<WeatherData>, t: Throwable) {
@@ -83,11 +83,11 @@ class WeatherViewModel(application: Application): AndroidViewModel(application) 
         val callBack = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
-                locationResult.lastLocation?.let {
-                    val result = getWeatherApiResult()
-                    viewModelScope.launch {
-                        setResultData(result, it.latitude, it.longitude)
-                    }
+                val locate = locationResult.lastLocation
+                locate ?: return
+                val result = getWeatherApiResult()
+                viewModelScope.launch {
+                    setResultData(result, locate.latitude, locate.longitude)
                 }
             }
         }
