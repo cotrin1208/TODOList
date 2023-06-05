@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.cotrin.todolist.R
 import com.cotrin.todolist.databinding.FragmentWeatherBinding
 import com.cotrin.todolist.utils.getDayOfWeekText
@@ -18,7 +17,6 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class WeatherFragment : Fragment() {
