@@ -1,6 +1,4 @@
-<layout
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
@@ -9,7 +7,7 @@
             type="com.cotrin.todolist.model.Task" />
         <variable
             name="viewModel"
-            type="com.cotrin.todolist.viewModel.TaskViewModel" />
+            type="com.cotrin.todolist.task.TaskViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView

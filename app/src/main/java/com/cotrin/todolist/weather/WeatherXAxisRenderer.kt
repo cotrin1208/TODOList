@@ -2,8 +2,6 @@ package com.cotrin.todolist.weather
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.renderer.XAxisRenderer
@@ -11,9 +9,6 @@ import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Transformer
 import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
-import okhttp3.internal.Util
-import kotlin.coroutines.coroutineContext
-import kotlin.reflect.jvm.internal.impl.load.java.descriptors.UtilKt
 
 class WeatherXAxisRenderer(
     viewPortHandler: ViewPortHandler,

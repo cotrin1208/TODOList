@@ -1,4 +1,4 @@
-package com.cotrin.todolist.viewModel
+package com.cotrin.todolist.taskDetailFragment
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

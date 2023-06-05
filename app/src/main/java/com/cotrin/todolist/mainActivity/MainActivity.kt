@@ -18,15 +18,20 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.cotrin.todolist.R
-import com.cotrin.todolist.model.Task
-import com.cotrin.todolist.TaskListAdapter
 import com.cotrin.todolist.databinding.ActivityMainBinding
+import com.cotrin.todolist.listener.OnDialogResultListener
+import com.cotrin.todolist.model.Task
+import com.cotrin.todolist.realm.RealmTask
+import com.cotrin.todolist.task.TaskListAdapter
+import com.cotrin.todolist.task.TaskViewModel
+import com.cotrin.todolist.taskDetailFragment.TaskDetailFragment
 import com.cotrin.todolist.utils.Reference
-import com.cotrin.todolist.viewModel.MainActivityViewModel
-import com.cotrin.todolist.viewModel.TaskViewModel
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
 
 class MainActivity : AppCompatActivity(), OnDialogResultListener {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var realm: Realm
     private val mainViewModel: MainActivityViewModel by lazy {
         ViewModelProvider(this)[MainActivityViewModel::class.java]
     }
@@ -42,6 +47,12 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.lifecycleOwner = this
 
+        //Realm
+        val config = RealmConfiguration.Builder(schema = setOf(RealmTask::class)).apply {
+            this.deleteRealmIfMigrationNeeded()
+            this.schemaVersion(1)
+        }.build()
+        realm = Realm.open(config)
         //通知権限の付与
         checkPermission()
         createNotificationChannel()

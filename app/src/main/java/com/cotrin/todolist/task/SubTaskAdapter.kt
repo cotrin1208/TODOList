@@ -1,4 +1,4 @@
-package com.cotrin.todolist
+package com.cotrin.todolist.task
 
 import android.text.Editable
 import android.text.TextWatcher

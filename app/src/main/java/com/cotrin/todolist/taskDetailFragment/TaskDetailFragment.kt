@@ -1,4 +1,4 @@
-package com.cotrin.todolist.mainActivity
+package com.cotrin.todolist.taskDetailFragment
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
@@ -21,14 +21,15 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.cotrin.todolist.R
+import com.cotrin.todolist.databinding.FragmentTaskDetailBinding
+import com.cotrin.todolist.listener.OnDialogResultListener
+import com.cotrin.todolist.mainActivity.MainActivity
+import com.cotrin.todolist.mainActivity.MainActivityViewModel
 import com.cotrin.todolist.model.ReminderInterval
 import com.cotrin.todolist.model.RepeatInterval
 import com.cotrin.todolist.model.Task
 import com.cotrin.todolist.model.TaskCategory
-import com.cotrin.todolist.databinding.FragmentTaskDetailBinding
 import com.cotrin.todolist.utils.isNull
-import com.cotrin.todolist.viewModel.MainActivityViewModel
-import com.cotrin.todolist.viewModel.TaskDetailViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 

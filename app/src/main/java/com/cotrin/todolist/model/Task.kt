@@ -1,8 +1,8 @@
 package com.cotrin.todolist.model
 
 import android.view.View
-import com.cotrin.todolist.model.ReminderInterval.NONE
 import com.cotrin.todolist.mainActivity.MainActivity
+import com.cotrin.todolist.model.ReminderInterval.NONE
 import com.cotrin.todolist.utils.GsonUtils
 import com.cotrin.todolist.utils.Reference
 import java.time.LocalDate

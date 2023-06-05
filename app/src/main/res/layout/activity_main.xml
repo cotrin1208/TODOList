@@ -4,11 +4,11 @@
     <data>
         <variable
             name="viewModel"
-            type="com.cotrin.todolist.viewModel.MainActivityViewModel" />
+            type="com.cotrin.todolist.mainActivity.MainActivityViewModel" />
 
         <variable
             name="adapter"
-            type="com.cotrin.todolist.TaskListAdapter" />
+            type="com.cotrin.todolist.task.TaskListAdapter" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

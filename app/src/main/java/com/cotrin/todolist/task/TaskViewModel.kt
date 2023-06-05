@@ -1,4 +1,4 @@
-package com.cotrin.todolist.viewModel
+package com.cotrin.todolist.task
 
 import android.app.AlarmManager
 import android.app.Application
@@ -9,11 +9,14 @@ import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.cotrin.todolist.R
+import com.cotrin.todolist.mainActivity.MainActivity
 import com.cotrin.todolist.model.ReminderInterval
-import com.cotrin.todolist.model.RepeatInterval.*
+import com.cotrin.todolist.model.RepeatInterval.DAILY
+import com.cotrin.todolist.model.RepeatInterval.MONTHLY
+import com.cotrin.todolist.model.RepeatInterval.NONE
+import com.cotrin.todolist.model.RepeatInterval.WEEKLY
 import com.cotrin.todolist.model.Task
 import com.cotrin.todolist.notification.TaskReminderReceiver
-import com.cotrin.todolist.mainActivity.MainActivity
 import com.cotrin.todolist.utils.GsonUtils
 import com.cotrin.todolist.utils.Reference
 import com.google.gson.reflect.TypeToken

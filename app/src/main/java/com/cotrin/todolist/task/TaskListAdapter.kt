@@ -1,4 +1,4 @@
-package com.cotrin.todolist
+package com.cotrin.todolist.task
 
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +14,6 @@ import com.cotrin.todolist.listener.OnItemClickListener
 import com.cotrin.todolist.listener.OnTextChangeListener
 import com.cotrin.todolist.model.SubTask
 import com.cotrin.todolist.model.Task
-import com.cotrin.todolist.viewModel.TaskViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
