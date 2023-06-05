@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Looper
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.cotrin.todolist.BuildConfig
 import com.cotrin.todolist.R
 import com.github.mikephil.charting.data.Entry
@@ -20,6 +22,7 @@ import com.google.android.gms.location.LocationServices
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
@@ -30,9 +33,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 class WeatherViewModel(application: Application): AndroidViewModel(application) {
     val cityName = MutableLiveData<String>()
     val weatherLiveData = MutableLiveData<WeatherData?>()
-    val locationUpdated = MutableLiveData<Boolean>()
-    private var lat = 0.0
-    private var lon = 0.0
 
     fun getWeatherApiResult(): WeatherApiService {
         //Moshiオブジェクトを作成
@@ -47,7 +47,7 @@ class WeatherViewModel(application: Application): AndroidViewModel(application) 
         return retrofit.create(WeatherApiService::class.java)
     }
 
-    suspend fun setResultData(result: WeatherApiService) {
+    suspend fun setResultData(result: WeatherApiService, lat: Double, lon: Double) {
         withContext(Dispatchers.IO) {
             //天気情報を取得
             val get = result.getWeatherData(lat, lon, "ja", BuildConfig.WEATHER_API_KEY, 40, "metric")
@@ -60,6 +60,8 @@ class WeatherViewModel(application: Application): AndroidViewModel(application) 
                 }
 
                 override fun onFailure(call: Call<WeatherData>, t: Throwable) {
+                    val context: Context = getApplication()
+                    Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
                     t.printStackTrace()
                 }
             })
@@ -82,9 +84,10 @@ class WeatherViewModel(application: Application): AndroidViewModel(application) 
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
                 locationResult.lastLocation?.let {
-                    lat = it.latitude
-                    lon = it.longitude
-                    locationUpdated.value = true
+                    val result = getWeatherApiResult()
+                    viewModelScope.launch {
+                        setResultData(result, it.latitude, it.longitude)
+                    }
                 }
             }
         }

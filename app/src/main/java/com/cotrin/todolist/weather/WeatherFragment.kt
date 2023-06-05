@@ -42,17 +42,6 @@ class WeatherFragment : Fragment() {
         //位置情報を更新
         weatherViewModel.updateLocation()
 
-        //位置情報が更新されたら、天気情報を取得する
-        weatherViewModel.locationUpdated.observe(requireActivity()) {
-            //falseなら早期リターン
-            if (!it) return@observe
-            val result = weatherViewModel.getWeatherApiResult()
-            lifecycleScope.launch {
-                weatherViewModel.setResultData(result)
-            }
-            weatherViewModel.locationUpdated.value = false
-        }
-
         //天気情報が更新されたらViewに反映する
         weatherViewModel.weatherLiveData.observe(requireActivity()) {
             //nullなら早期リターン
