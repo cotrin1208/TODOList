@@ -2,10 +2,6 @@ package com.cotrin.todolist.utils
 
 import java.time.LocalDate
 
-fun <T> T?.isNull(): Boolean {
-    return this == null
-}
-
 fun LocalDate.getDayOfWeekText(): String {
     val dateText = this.format(Reference.DAY_FORMATTER)
     val dayOfWeek = when (this.dayOfWeek.value) {

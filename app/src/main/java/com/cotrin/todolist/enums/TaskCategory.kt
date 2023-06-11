@@ -1,4 +1,4 @@
-package com.cotrin.todolist.model
+package com.cotrin.todolist.enums
 
 import com.cotrin.todolist.R
 

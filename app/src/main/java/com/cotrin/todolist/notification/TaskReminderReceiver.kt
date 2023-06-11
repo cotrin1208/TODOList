@@ -7,8 +7,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.cotrin.todolist.R
+import com.cotrin.todolist.enums.ReminderInterval.valueOf
 import com.cotrin.todolist.mainActivity.MainActivity
-import com.cotrin.todolist.model.ReminderInterval.valueOf
 import com.cotrin.todolist.utils.Reference
 
 class TaskReminderReceiver: BroadcastReceiver() {

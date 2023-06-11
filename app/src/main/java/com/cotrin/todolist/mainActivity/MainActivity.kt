@@ -17,21 +17,23 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.cotrin.todolist.R
 import com.cotrin.todolist.databinding.ActivityMainBinding
-import com.cotrin.todolist.listener.OnDialogResultListener
-import com.cotrin.todolist.model.Task
-import com.cotrin.todolist.realm.RealmTask
+import com.cotrin.todolist.realm.IDGenerator
+import com.cotrin.todolist.realm.RealmUtil
+import com.cotrin.todolist.realm.Task
+import com.cotrin.todolist.realm.TaskViewModel
 import com.cotrin.todolist.task.TaskListAdapter
-import com.cotrin.todolist.task.TaskViewModel
 import com.cotrin.todolist.taskDetailFragment.TaskDetailFragment
 import com.cotrin.todolist.utils.Reference
-import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.InitialResults
+import io.realm.kotlin.notifications.UpdatedResults
+import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(), OnDialogResultListener {
+class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var realm: Realm
     private val mainViewModel: MainActivityViewModel by lazy {
         ViewModelProvider(this)[MainActivityViewModel::class.java]
     }
@@ -46,23 +48,33 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.lifecycleOwner = this
-
-        //Realm
-        val config = RealmConfiguration.Builder(schema = setOf(RealmTask::class)).apply {
-            this.deleteRealmIfMigrationNeeded()
-            this.schemaVersion(1)
-        }.build()
-        realm = Realm.open(config)
         //通知権限の付与
         checkPermission()
         createNotificationChannel()
-        //タスクロード
+        //Realm設定
+        val realm = RealmUtil.getRealm()
+        val tasks = realm.query<Task>().find()
+        lifecycleScope.launch {
+            tasks.asFlow().collect {
+                when (it) {
+                    //更新時
+                    is UpdatedResults -> taskViewModel.taskList.value = it.list
+                    //起動時
+                    is InitialResults -> {
+                        //翌日繰り越し処理
+                        taskViewModel.carryoverTasks()
+                        //リピート処理
+                        taskViewModel.repeatTasks()
+                        //リマインド再設定処理
+                        taskViewModel.setAllReminders()
+                        taskViewModel.taskList.value = it.list
+                    }
+                }
+            }
+        }
+        //SharedPreferencesを読み込み、リクエストIDの開始値を取得
         sharedPreferences = this@MainActivity.getSharedPreferences(Reference.APP_ID, MODE_PRIVATE)
-        taskViewModel.loadTasks()
-        //翌日繰り越し処理
-        taskViewModel.carryoverTasks()
-        //リピート処理
-        taskViewModel.repeatTasks()
+        IDGenerator.setStartValue(sharedPreferences.getInt(Reference.REQUEST_ID_START, -1))
         //RecyclerViewの表示
         binding.adapter = TaskListAdapter(this@MainActivity, taskViewModel).apply {
             submitList(taskViewModel.taskList.value)
@@ -75,7 +87,6 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
         //タスクリスト更新処理
         taskViewModel.taskList.observe(this) {
             binding.adapter?.submitList(it)
-            taskViewModel.saveTasks()
         }
         //タスク詳細ポップアップメニュー
         taskViewModel.isDetailShown.observe(this) {
@@ -148,7 +159,6 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
                     R.id.menu_delete -> {
                         showDeleteAlertDialog {
                             taskViewModel.deleteTask(task)
-                            taskViewModel.saveTasks()
                         }
                         true
                     }
@@ -191,13 +201,5 @@ class MainActivity : AppCompatActivity(), OnDialogResultListener {
             Manifest.permission.ACCESS_FINE_LOCATION
         )
         requestPermissions(permissions, 123)
-    }
-
-    override fun onDialogResult(task: Task, mode: String) {
-        if (mode == Reference.ADD) {
-            taskViewModel.addTask(task)
-        } else if (mode == Reference.EDIT) {
-            taskViewModel.editTask(task)
-        }
     }
 }

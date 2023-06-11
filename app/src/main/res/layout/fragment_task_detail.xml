@@ -3,12 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="task"
-            type="com.cotrin.todolist.model.Task" />
-
-        <variable
             name="viewModel"
-            type="com.cotrin.todolist.taskDetailFragment.TaskDetailViewModel" />
+            type="com.cotrin.todolist.mainActivity.MainActivityViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -35,14 +31,15 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:gravity="center"
-                android:hint="タスク名を入力"
+                android:hint="@string/fragment_task_detail_title_hint"
                 android:inputType="textNoSuggestions"
-                android:text="@{viewModel.name}"
+                android:text="@{viewModel.taskData.name}"
                 android:textColorHint="@android:color/darker_gray"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:autofillHints="" />
 
             <ImageButton
                 android:id="@+id/applyTaskButton"
@@ -55,7 +52,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider9"
-                app:srcCompat="@drawable/check_button_icon" />
+                app:srcCompat="@drawable/check_button_icon"
+                android:contentDescription="@string/content_description_apply_task" />
 
             <View
                 android:id="@+id/divider2"
@@ -145,14 +143,15 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/calendar_icon" />
+                    app:srcCompat="@drawable/calendar_icon"
+                    android:contentDescription="@string/content_description_date_icon" />
 
                 <TextView
                     android:id="@+id/detailTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="日付"
+                    android:text="@string/date"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/taskDateIcon"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -161,11 +160,11 @@
                     android:id="@+id/taskDateText"
                     android:layout_width="120dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
+                    android:layout_gravity="end"
                     android:layout_marginStart="80dp"
                     android:layout_marginEnd="8dp"
                     android:gravity="center"
-                    android:text="@{viewModel.date.toString()}"
+                    android:text="@{viewModel.taskData.date.toString()}"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -196,14 +195,15 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/time_icon" />
+                    app:srcCompat="@drawable/time_icon"
+                    android:contentDescription="@string/content_description_time_icon" />
 
                 <TextView
                     android:id="@+id/detailTitle2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="時間"
+                    android:text="@string/time"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/taskTimeIcon"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -215,7 +215,7 @@
                     android:layout_marginStart="80dp"
                     android:layout_marginEnd="8dp"
                     android:gravity="center"
-                    android:text="@{viewModel.timeText}"
+                    android:text="@{viewModel.taskData.timeText}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/detailTitle2"
@@ -243,14 +243,15 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/task_attribute_remind" />
+                    app:srcCompat="@drawable/task_attribute_remind"
+                    android:contentDescription="@string/content_description_remind_icon" />
 
                 <TextView
                     android:id="@+id/detailTitle3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="リマインド"
+                    android:text="@string/remind"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/remindIcon"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -262,7 +263,7 @@
                     android:layout_marginStart="38dp"
                     android:layout_marginEnd="8dp"
                     android:gravity="center"
-                    android:text="@{viewModel.remind.optionName}"
+                    android:text="@{viewModel.taskData.remind.optionName}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.759"
@@ -292,14 +293,15 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/task_attribute_repeat" />
+                    app:srcCompat="@drawable/task_attribute_repeat"
+                    android:contentDescription="@string/content_description_repeat_icon" />
 
                 <TextView
                     android:id="@+id/detailTitle4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="リピート"
+                    android:text="@string/repeat"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/taskRepeatIcon"
                     app:layout_constraintTop_toTopOf="parent"
@@ -312,7 +314,7 @@
                     android:layout_marginStart="52dp"
                     android:layout_marginEnd="8dp"
                     android:gravity="center"
-                    android:text="@{viewModel.repeat.optionName}"
+                    android:text="@{viewModel.taskData.repeat.optionName}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/detailTitle4"
@@ -340,14 +342,15 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/task_attribute_carryover" />
+                    app:srcCompat="@drawable/task_attribute_carryover"
+                    android:contentDescription="@string/content_description_carryover_icon" />
 
                 <TextView
                     android:id="@+id/detailTitle5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="繰り越し"
+                    android:text="@string/carryover"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/taskCarryoverIcon"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -359,7 +362,7 @@
                     android:layout_marginStart="90dp"
                     android:layout_marginEnd="43dp"
                     android:clickable="false"
-                    android:checked="@{viewModel.carryover}"
+                    android:checked="@{viewModel.taskData.carryover}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -386,10 +389,11 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
-                    app:imageResource="@{viewModel.category.iconResId}"
+                    app:imageResource="@{viewModel.taskData.category.iconResId}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:contentDescription="@string/content_description_category_icon" />
 
                 <TextView
                     android:id="@+id/taskCategoryText"
@@ -398,7 +402,7 @@
                     android:layout_marginStart="52dp"
                     android:layout_marginEnd="8dp"
                     android:gravity="center"
-                    android:text="@{viewModel.category.categoryName}"
+                    android:text="@{viewModel.taskData.category.categoryName}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/detailTitle6"
@@ -409,7 +413,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="カテゴリ"
+                    android:text="@string/category"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/taskCategoryIcon"
                     app:layout_constraintTop_toTopOf="parent" />

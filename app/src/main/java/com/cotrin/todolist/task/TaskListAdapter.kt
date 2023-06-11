@@ -1,23 +1,15 @@
 package com.cotrin.todolist.task
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.cotrin.todolist.databinding.LayoutTaskCardBinding
-import com.cotrin.todolist.listener.OnItemClickListener
-import com.cotrin.todolist.listener.OnTextChangeListener
-import com.cotrin.todolist.model.SubTask
-import com.cotrin.todolist.model.Task
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.cotrin.todolist.realm.Task
+import com.cotrin.todolist.realm.TaskViewModel
 
 class TaskListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
@@ -31,7 +23,17 @@ class TaskListAdapter(
             }
 
             override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
-                return oldItem == newItem
+                return (oldItem.name == newItem.name &&
+                        oldItem.date == newItem.date &&
+                        oldItem.time == newItem.time &&
+                        oldItem.remind == newItem.remind &&
+                        oldItem.repeat == newItem.repeat &&
+                        oldItem.carryover == newItem.carryover &&
+                        oldItem.category == newItem.category &&
+                        oldItem.subTasks.map { it.isFinished } == newItem.subTasks.map { it.isFinished } &&
+                        oldItem.subTasks.map { it.name } == newItem.subTasks.map { it.name } &&
+                        oldItem.uuid == newItem.uuid &&
+                        oldItem.requestID == newItem.requestID)
             }
         }
     }
@@ -59,24 +61,8 @@ class TaskListAdapter(
             progressBar.setValueAnimated(task.subTasks.count { it.isFinished }.toFloat(), 200)
 
             fun updateProgress() {
-                progressBar.maxValue = if (task.subTasks.size == 0) 1f else task.subTasks.size.toFloat()
+                progressBar.maxValue = if (task.subTasks.size == 0) 1.1f else task.subTasks.size.toFloat()
                 progressBar.setValueAnimated(task.subTasks.count { it.isFinished }.toFloat(), 200)
-
-                CoroutineScope(Dispatchers.Main).launch {
-                    //アニメーションが終わるまで待つ
-                    delay(250)
-                    //サブタスクが無い場合はブロックを抜ける
-                    if (task.subTasks.isEmpty()) return@launch
-                    //プログレスバーが100%になったとき
-                    if (progressBar.maxValue == progressBar.currentValue) {
-                        //タスクを完了する
-                        if (!task.isFinished) viewModel.editTask(task.copy(isFinished = true))
-                        //プログレスバーが100%から変動したとき
-                    } else {
-                        //タスクを未達にする
-                        if (task.isFinished) viewModel.editTask(task.copy(isFinished = false))
-                    }
-                }
             }
             updateProgress()
 
@@ -87,38 +73,11 @@ class TaskListAdapter(
             binding.categoryChip.chipIcon = drawable
             //サブタスク追加
             binding.addSubTask.setOnClickListener {
-                task.subTasks.add(SubTask())
-                binding.subTasks.adapter?.notifyItemInserted(task.subTasks.size - 1)
-                viewModel.saveTasks()
-                updateProgress()
+                viewModel.addSubTask(task)
             }
-            binding.subTasks.adapter = SubTaskAdapter(task.subTasks).apply {
-                //チェックボックスリスナー登録
-                setOnCheckBoxClickListener(object: OnItemClickListener {
-                    override fun onItemClick(view: View, position: Int) {
-                        task.subTasks[position].isFinished = (view as CheckBox).isChecked
-                        viewModel.saveTasks()
-                        updateProgress()
-                    }
-                })
-                //テキストリスナー登録
-                setOnTextChangeListener(object: OnTextChangeListener {
-                    override fun onTextChanged(s: CharSequence, position: Int) {
-                        task.subTasks[position].name = s.toString()
-                        viewModel.saveTasks()
-                    }
-                })
-                //サブタスク削除ボタンのリスナー登録
-                setOnDeleteButtonClickListener(object: OnItemClickListener {
-                    override fun onItemClick(view: View, position: Int) {
-                        task.subTasks.removeAt(position)
-                        notifyItemRemoved(position)
-                        notifyItemRangeChanged(position, itemCount)
-                        viewModel.saveTasks()
-                        updateProgress()
-                    }
-                })
-            }
+            //サブタスクRecyclerViewのリスト設定
+            binding.subTasks.adapter = SubTaskListAdapter(viewLifecycleOwner, viewModel, task)
+            (binding.subTasks.adapter as SubTaskListAdapter).submitList(task.subTasks)
         }
     }
 }

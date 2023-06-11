@@ -1,4 +1,4 @@
-package com.cotrin.todolist.model
+package com.cotrin.todolist.enums
 
 enum class RepeatInterval(val OptionName: String) {
     NONE("リピート無し"),

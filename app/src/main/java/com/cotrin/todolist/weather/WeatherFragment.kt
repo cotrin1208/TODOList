@@ -59,11 +59,13 @@ class WeatherFragment : Fragment() {
                 //データをセット
                 data = lineData
                 //一画面の情報を8個に指定
-                setVisibleXRangeMaximum(7.5f)
+                setVisibleXRangeMaximum(8f)
                 //データが無いときのテキスト設定
                 setNoDataText("天気情報をロード中")
                 //背景グリッドを設定
                 setDrawGridBackground(false)
+                //破線をリセット
+                xAxis.removeAllLimitLines()
                 //日付をまたぐ箇所に破線を表示
                 for (i in 1 .. 5) {
                     val limitLineText = LocalDate.now().plusDays(i.toLong()).getDayOfWeekText()
@@ -88,9 +90,6 @@ class WeatherFragment : Fragment() {
                 //X軸のラベルレンダーを設定
                 val renderer = WeatherXAxisRenderer(viewPortHandler, xAxis, getTransformer(YAxis.AxisDependency.LEFT), requireContext())
                 setXAxisRenderer(renderer)
-                //X軸に余白を追加
-                xAxis.axisMinimum -= 0.5f
-                xAxis.axisMaximum += 0.5f
                 //Y軸を不可視に設定
                 axisRight.isEnabled = false
                 axisLeft.isEnabled = false

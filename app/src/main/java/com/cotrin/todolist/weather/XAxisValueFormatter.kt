@@ -8,6 +8,7 @@ class XAxisValueFormatter(
     private val icons: List<Int>
     ): ValueFormatter() {
     override fun getFormattedValue(value: Float): String {
+        if (value.toInt() < 0) return ""
         for (i in 5 downTo 1) {
             if (startTime + 3 * value.toInt() >= 24 * i) {
                 return "${startTime + 3 * value.toInt() - 24 * i}時\n${pops[value.toInt()]}\n${icons[value.toInt()]}"
