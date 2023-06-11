@@ -16,6 +16,25 @@
     <string name="shared_pref_key_tasks">TASK_LIST</string>
     <string name="fragment_mode_add">ADD</string>
     <string name="fragment_mode_edit">EDIT</string>
+    <string name="fragment_task_detail_title_hint">タスク名を入力</string>
+    <string name="date">日付</string>
+    <string name="time">時間</string>
+    <string name="remind">リマインド</string>
+    <string name="repeat">リピート</string>
+    <string name="carryover">繰り越し</string>
+    <string name="category">カテゴリ</string>
+    <string name="add_sub_task">サブタスクを追加</string>
+    <string name="sub_task_hint">サブタスク名を入力</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="content_description_delete_sub_task">サブタスクを削除</string>
+    <string name="content_description_apply_task">タスクを確定</string>
+    <string name="content_description_date_icon">日付アイコン</string>
+    <string name="content_description_time_icon">時間アイコン</string>
+    <string name="content_description_remind_icon">リマインドアイコン</string>
+    <string name="content_description_repeat_icon">リピートアイコン</string>
+    <string name="content_description_carryover_icon">繰り越しアイコン</string>
+    <string name="content_description_category_icon">カテゴリアイコン</string>
+    <string name="content_description_task_menu_button">タスク詳細ボタン</string>
+    <string name="content_description_sub_task_add_icon">サブタスク追加アイコン</string>
 </resources>
