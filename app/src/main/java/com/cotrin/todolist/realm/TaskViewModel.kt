@@ -89,10 +89,12 @@ class TaskViewModel(application: Application): AndroidViewModel(application) {
             for (subTask in targetTask.subTasks) {
                 if (!subTask.isFinished) {
                     targetTask.isFinished = false
+                    setRemindNotification(targetTask)
                     return@writeBlocking
                 }
             }
             targetTask.isFinished = true
+            cancelRemindNotification(targetTask)
             copyToRealm(targetTask, UpdatePolicy.ALL)
         }
     }
